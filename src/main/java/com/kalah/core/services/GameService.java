@@ -1,6 +1,6 @@
-package com.backbase.core.services;
+package com.kalah.core.services;
 
-import com.backbase.core.config.AppConfig;
+import com.kalah.core.config.AppConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

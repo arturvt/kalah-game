@@ -1,4 +1,4 @@
-package com.backbase.core.services;
+package com.kalah.core.services;
 
 import org.junit.Test;
 

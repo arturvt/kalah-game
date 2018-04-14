@@ -1,7 +1,6 @@
-package com.backbase.core.controller;
+package com.kalah.core.controller;
 
-import com.backbase.core.services.GameService;
-import com.backbase.core.services.IGameService;
+import com.kalah.core.services.IGameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;

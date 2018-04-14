@@ -1,4 +1,4 @@
-package com.backbase.core.services;
+package com.kalah.core.services;
 
 public interface IGameService {
 
