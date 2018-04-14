@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -49,32 +50,62 @@ public class GameService {
     }
 
     /**
+     * This getter should only be used for testing purposes. Only this
+     * @return
+     */
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    /**
      * Plays the desired index for current player.
      * Service must know who's current player.
      *
      * @param indexPit
      */
-    public void play(int indexPit) {
+    public void play(int indexPit) throws BadAttributeValueExpException {
         logger.info(String.format("[%d] - plays pit -> %d", this.currentPlayerRound, indexPit));
 
         if (hasGameEnded()) {
             logger.info("End Game!");
             logger.info("Checking the winner...");
         } else {
-            int nextPlayer = verifyNextPlayer();
-            if (this.currentPlayerRound == nextPlayer) {
-                logger.info(String.format("[%d] - has a new turn", this.currentPlayerRound));
+            int playResult = this.players[this.currentPlayerRound].play(indexPit);
+
+            if (playResult == 0) {
+                logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
+            } else if (playResult > 0) {
+                addStonesToNextPlayer(playResult);
+                switchPlayer();
             } else {
-                this.currentPlayerRound = nextPlayer;
-                logger.info(String.format("[%d] - is the next player", this.currentPlayerRound));
+                captureStones(-playResult);
+                switchPlayer();
             }
         }
+    }
 
+    private void switchPlayer() {
+        if (this.currentPlayerRound == 0) {
+            this.currentPlayerRound = 1;
+        } else {
+            this.currentPlayerRound =1;
+        }
+        logger.info(String.format("[%d] - is the next player", this.currentPlayerRound));
+    }
+
+    private void addStonesToNextPlayer(int stones) {
+        //TODO: Implement this
+    }
+
+    private void captureStones(int indexPit) {
+        //TODO: Implement this.
+        // It should check if capture is allowed.
+        // It should send user's indexPit to house.
     }
 
     //TODO: implement this
-    private int verifyNextPlayer() {
-        return -1;
+    private void updateNextPlayer() {
+        // nothing now.
     }
 
     public boolean hasGameEnded() {

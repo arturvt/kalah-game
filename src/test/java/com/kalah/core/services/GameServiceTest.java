@@ -5,6 +5,7 @@ import com.kalah.core.dto.PlayersDTO;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +45,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void play() {
+    public void play() throws BadAttributeValueExpException {
         gameService.initGame();
         gameService.play(1);
     }
