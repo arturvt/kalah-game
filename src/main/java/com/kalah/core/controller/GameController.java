@@ -1,6 +1,7 @@
 package com.kalah.core.controller;
 
-import com.kalah.core.services.IGameService;
+import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,17 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration
 public class GameController {
 
-    final private IGameService service;
+    final private GameService service;
 
     @Autowired
-    public GameController(IGameService service) {
+    public GameController(GameService service) {
         this.service = service;
     }
 
     @RequestMapping("/")
     @ResponseBody
     String home() {
-        service.verifyGameConfig();
         return "Hello from backbase!";
+    }
+
+    @RequestMapping("/init")
+    PlayersDTO initGame() {
+        return  service.initGame();
     }
 }

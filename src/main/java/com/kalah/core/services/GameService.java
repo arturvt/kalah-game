@@ -1,13 +1,18 @@
 package com.kalah.core.services;
 
 import com.kalah.core.config.AppConfig;
+import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.model.Player;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
-public class GameService implements IGameService {
+public class GameService {
+    public static final int NUMBER_OF_PLAYERS = 2;
 
     final private static Log logger = LogFactory.getLog(GameService.class);
 
@@ -15,24 +20,27 @@ public class GameService implements IGameService {
 
     private Integer currentPlayerRound = null;
 
+    private Player[] players;
+
     @Autowired
     public GameService(AppConfig gameConfig) {
         this.gameConfig = gameConfig;
     }
 
-    public void verifyGameConfig() {
-        if (this.gameConfig.getNumberStones() > 0) {
-            logger.info("Game can start....");
-        }
-    }
-
     /**
      * Creates a new game, with default stones for every player.
      */
-    public void initGame() {
+    public PlayersDTO initGame() {
         logger.info("Starting a new game.");
         this.currentPlayerRound = gameConfig.getDefaultFirstPlayer();
-        logger.info("First player: " + this.currentPlayerRound);
+        this.players = new Player[NUMBER_OF_PLAYERS];
+        this.players[0] = new Player("Player 01", gameConfig.getNumberStones());
+        this.players[1] = new Player("Player 02", gameConfig.getNumberStones());
+        logger.info("First round: " + this.players[this.currentPlayerRound].getPlayerName());
+        return PlayersDTO.builder()
+                .setLastUpdate(new Date())
+                .setPlayers(this.players)
+                .createPlayersDTO();
     }
 
 
