@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
 
 @Service
@@ -43,7 +44,16 @@ public class GameService {
                 .createPlayersDTO();
     }
 
+    public Integer getCurrentPlayerRound() {
+        return currentPlayerRound;
+    }
 
+    /**
+     * Plays the desired index for current player.
+     * Service must know who's current player.
+     *
+     * @param indexPit
+     */
     public void play(int indexPit) {
         logger.info(String.format("[%d] - plays pit -> %d", this.currentPlayerRound, indexPit));
 
@@ -67,9 +77,8 @@ public class GameService {
         return -1;
     }
 
-    //TODO: implement this
-    private boolean hasGameEnded() {
-        return false;
+    public boolean hasGameEnded() {
+        return Arrays.stream(this.players).anyMatch(Player::hasAllPitsEmpty);
     }
 
 }

@@ -30,7 +30,10 @@ public class GameServiceTest {
      */
     @Test
     public void initGame() {
+        // it starts null.
+        assertThat(gameService.getCurrentPlayerRound()).isNull();
         PlayersDTO dto = gameService.initGame();
+        assertThat(gameService.getCurrentPlayerRound()).isEqualTo(1);
         assertThat(dto.getPlayers()).isNotNull();
         for (int i = 0; i < GameService.NUMBER_OF_PLAYERS; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
@@ -42,5 +45,24 @@ public class GameServiceTest {
 
     @Test
     public void play() {
+        gameService.initGame();
+        gameService.play(1);
+    }
+
+    @Test
+    public void gameShouldNotEndWhenJustBegin() {
+        gameService.initGame();
+        assertThat(gameService.hasGameEnded()).isFalse();
+    }
+
+    @Test
+    public void gameShouldEndWhenAPlayerHasNotPits() {
+        AppConfig config = new AppConfig();
+        config.setDefaultFirstPlayer(1);
+        config.setRulesEmptyHouse(true);
+        config.setStonesNumber(0); // No stones!
+        GameService service = new GameService(config);
+        service.initGame();
+        assertThat(service.hasGameEnded()).isTrue();
     }
 }

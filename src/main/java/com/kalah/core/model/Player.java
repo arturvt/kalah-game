@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Arrays;
+
 public class Player {
     public static final int NUMBER_HOUSES = 6;
     final private static Log logger = LogFactory.getLog(Player.class);
@@ -28,16 +30,20 @@ public class Player {
     }
 
 
-    public int getHouse() {
+    final public int getHouse() {
         return house;
     }
 
-    public int[] getPits() {
+    final public int[] getPits() {
         return pits;
     }
 
-    public String getPlayerName() {
+    final public String getPlayerName() {
         return playerName;
+    }
+
+    final public boolean hasAllPitsEmpty(){
+        return Arrays.stream(this.pits).allMatch(p -> p == 0);
     }
 
     public void printCurrentStatus() {
