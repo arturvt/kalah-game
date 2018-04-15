@@ -1,5 +1,6 @@
 package com.kalah.core.services;
 
+import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
 import com.kalah.core.model.PlayResult;
@@ -13,14 +14,13 @@ import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 import java.util.Date;
 
+
 @Service
 public class GameService {
-    public static final int NUMBER_OF_PLAYERS = 2;
-
+    private static final int NUMBER_OF_PLAYERS = 2;
     final private static Log logger = LogFactory.getLog(GameService.class);
-
     final private AppConfig gameConfig;
-
+    private GameStatus gameStatus = GameStatus.NOT_STARTED;
     private Integer currentPlayerRound = null;
 
     private Player[] players;
@@ -28,6 +28,7 @@ public class GameService {
     @Autowired
     public GameService(AppConfig gameConfig) {
         this.gameConfig = gameConfig;
+        this.gameStatus = GameStatus.NOT_STARTED;
     }
 
     /**
@@ -49,6 +50,7 @@ public class GameService {
         this.players = new Player[NUMBER_OF_PLAYERS];
         this.players[0] = new Player("Player 01", gameConfig.getNumberStones());
         this.players[1] = new Player("Player 02", gameConfig.getNumberStones());
+        this.gameStatus = GameStatus.RUNNING;
         logger.info("First round: " + this.players[this.currentPlayerRound].getPlayerName());
         return PlayersDTO.builder()
                 .setLastUpdate(new Date())
@@ -94,11 +96,6 @@ public class GameService {
         if (switchPlayer) {
             switchPlayer();
         }
-
-        if (hasGameEnded()) {
-            logger.info("End Game!");
-            logger.info("Checking the winner...");
-        }
     }
 
     private void switchPlayer() {
@@ -122,7 +119,7 @@ public class GameService {
      * @param playResult - number of stones to be distributed
      */
     private void distributeStones(int playResult) {
-        while(playResult != 0) {
+        while (playResult != 0) {
             playResult = addStonesToNextPlayer(playResult);
             playResult = addStonesToCurrentPlayer(playResult);
         }
@@ -161,6 +158,31 @@ public class GameService {
 
     public boolean hasGameEnded() {
         return Arrays.stream(this.players).anyMatch(Player::hasAllPitsEmpty);
+    }
+
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public void finishGame() {
+        if (gameConfig.isRemainingGoesToOwner()) {
+            int indexStillMissingStones = this.players[0].hasAllPitsEmpty() ? 0 : 1;
+            this.players[indexStillMissingStones].moveAllStonesToHouse();
+        }
+
+        int player01Amount = this.players[0].getHouse();
+        int player02Amount = this.players[1].getHouse();
+
+
+        if (player01Amount == player02Amount) {
+            this.gameStatus = GameStatus.DRAW;
+        } else if (player01Amount > player02Amount) {
+            this.gameStatus = GameStatus.PLAYER_1_WON;
+        } else {
+            this.gameStatus = GameStatus.PLAYER_2_WON;
+        }
+
     }
 
 }

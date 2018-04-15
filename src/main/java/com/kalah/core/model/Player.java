@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public class Player {
     public static final int NUMBER_HOUSES = 6;
@@ -26,8 +27,6 @@ public class Player {
         for (int i = 0; i < NUMBER_HOUSES; i++) {
             this.pits[i] = initStonesSize;
         }
-
-        printCurrentStatus();
     }
 
 
@@ -115,6 +114,19 @@ public class Player {
             numberOfStones--;
         }
         return numberOfStones;
+    }
+
+    final public void moveAllStonesToHouse() {
+        int allStones = this.removeAllStones();
+        this.addIntoHouse(allStones);
+    }
+
+    final public int removeAllStones() {
+        int res = 0;
+        for (int i = 0; i < Player.NUMBER_HOUSES; i++) {
+            res+= removeStonesFromIndex(i);
+        }
+        return res;
     }
 
     final public int removeStonesFromIndex(int index) {

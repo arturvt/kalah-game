@@ -1,5 +1,6 @@
 package com.kalah.core.services;
 
+import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
 import com.kalah.core.model.Player;
@@ -8,6 +9,7 @@ import org.junit.Test;
 
 import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,11 +24,16 @@ public class GameServiceTest {
 
     @BeforeClass
     public static void setupClass() {
+        gameService = new GameService(generateDefaultAppConfig());
+    }
+
+    private static AppConfig generateDefaultAppConfig() {
         AppConfig config = new AppConfig();
         config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
         config.setRulesEmptyHouse(true);
+        config.setRemainingGoesToOwner(true);
         config.setStonesNumber(INIT_STONES_SIZE);
-        gameService = new GameService(config);
+        return config;
     }
 
 
@@ -35,10 +42,13 @@ public class GameServiceTest {
      */
     @Test
     public void initGame() {
-        PlayersDTO dto = gameService.initGame();
-        assertThat(gameService.getCurrentPlayerRound()).isEqualTo(FIRST_PLAYER_INDEX);
+        GameService service = new GameService(generateDefaultAppConfig());
+        assertThat(service.getGameStatus()).isEqualByComparingTo(GameStatus.NOT_STARTED);
+        PlayersDTO dto = service.initGame();
+        assertThat(service.getGameStatus()).isEqualByComparingTo(GameStatus.RUNNING);
+        assertThat(service.getCurrentPlayerRound()).isEqualTo(FIRST_PLAYER_INDEX);
         assertThat(dto.getPlayers()).isNotNull();
-        for (int i = 0; i < GameService.NUMBER_OF_PLAYERS; i++) {
+        for (int i = 0; i < 2; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
             Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(INIT_STONES_SIZE));
         }
@@ -104,7 +114,7 @@ public class GameServiceTest {
             try {
                 gameService.play(index); // p1
                 gameService.printPlayersStatus();
-                if (index == Player.NUMBER_HOUSES-1) {
+                if (index == Player.NUMBER_HOUSES - 1) {
                     System.out.println("-----------");
                     return;
                 }
@@ -132,7 +142,7 @@ public class GameServiceTest {
         assertThat(p2.getPits()[4]).isEqualTo(1);
         assertThat(p2.getPits()[5]).isEqualTo(13);
 
-        gameService.play(Player.NUMBER_HOUSES-1); // now the movement.
+        gameService.play(Player.NUMBER_HOUSES - 1); // now the movement.
 
         // With this scenario, last movement makes a great capture. Checking if it happens.
         assertThat(p1.getHouse()).isEqualTo(5);
@@ -239,7 +249,23 @@ public class GameServiceTest {
 
 
     @Test
-    public void gameShouldEndWhenAPlayerHasNotStonesInPitsAfterSomeMoves() {
-        fail("Not yet implemented");
+    public void gameShouldEndWhenNotStonesInOnePlayerPitsRemainingGoesToWinner() {
+        Random random = new Random();
+        gameService.initGame();
+        while (!gameService.hasGameEnded()) {
+            int index = random.nextInt(Player.NUMBER_HOUSES);
+            try {
+                gameService.play(index);
+            } catch (BadAttributeValueExpException e) {
+                // ignores.
+            }
+        }
+
+        int indexWinner = gameService.getPlayers()[0].hasAllPitsEmpty() ? 0 : 1;
+        int indexLoser = -(indexWinner - 1);
+
+        gameService.printPlayersStatus();
+        gameService.finishGame();
+        gameService.printPlayersStatus();
     }
 }

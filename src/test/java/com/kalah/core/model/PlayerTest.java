@@ -242,4 +242,16 @@ public class PlayerTest {
         assertThat(p.getPits()[5]).isEqualTo(0);
         assertThat(p.getHouse()).isEqualTo(1);
     }
+
+    @Test
+    public void shouldRemoveAllMissingStones() throws BadAttributeValueExpException {
+        Player p = new Player(P_NAME, STONE_SIZE);
+        p.play(Player.NUMBER_HOUSES-1);
+        p.play(Player.NUMBER_HOUSES-2);
+        int numberOfStones = p.removeAllStones();
+        IntStream.range(0, Player.NUMBER_HOUSES-1).forEach(i -> assertThat(p.getPits()[i]).isEqualTo(0));
+
+        int shouldHave = STONE_SIZE * (Player.NUMBER_HOUSES-2) + 1;
+        assertThat(numberOfStones).isEqualTo(shouldHave);
+    }
 }
