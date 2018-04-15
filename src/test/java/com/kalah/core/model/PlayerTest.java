@@ -38,6 +38,27 @@ public class PlayerTest {
     }
 
     @Test
+    public void shouldRemoveStonesFromGivenIndex() {
+        Player p = new Player(P_NAME, STONE_SIZE);
+        int res = p.removeStonesFromIndex(3);
+        assertThat(res).isEqualTo(STONE_SIZE);
+        assertThat(p.getPits()[3]).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldAddStonesToHouse() {
+        Player p = new Player(P_NAME, STONE_SIZE);
+        assertThat(p.getHouse()).isEqualTo(0);
+        p.addIntoHouse(3);
+        assertThat(p.getHouse()).isEqualTo(3);
+        p.addIntoHouse(3);
+        assertThat(p.getHouse()).isEqualTo(6);
+
+
+    }
+
+
+    @Test
     public void shouldDistributeStonesAndIncrementHouseNoResultant() {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 4;
@@ -169,7 +190,7 @@ public class PlayerTest {
      * @throws BadAttributeValueExpException
      */
     @Test
-    public void shouldDistributeAndReturnNegativeIndicatingCapture() throws BadAttributeValueExpException {
+    public void shouldDistributeAndReturnIsCapture() throws BadAttributeValueExpException {
         Player p = new Player(P_NAME, 2);
 
         int indexPitWillBeEmpty = Player.NUMBER_HOUSES - 1;
@@ -183,9 +204,10 @@ public class PlayerTest {
         p.printCurrentStatus();
 
         playResult = p.play(indexPit);
-        assertThat(playResult.getResultantStones()).isLessThan(0);
+        assertThat(playResult.getResultantStones()).isEqualTo(0);
         assertThat(playResult.isPerfectMovement()).isFalse();
-        assertThat(playResult.getResultantStones()).isEqualTo(-indexPitWillBeEmpty);
+        assertThat(playResult.isCaptureMovement()).isTrue();
+        assertThat(playResult.getCaptureIndex()).isEqualTo(indexPitWillBeEmpty);
         assertThat(p.getPits()[indexPit]).isEqualTo(0);
         assertThat(p.getHouse()).isEqualTo(1);
         p.printCurrentStatus();

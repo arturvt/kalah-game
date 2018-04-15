@@ -13,7 +13,9 @@ A REST controller that returns a JSON object with information related with the g
 
 ### The game service
 
-This service is responsible to deal with any controller request. All reques
+This service is responsible to handle all controller requests and return a DTO.
+Game service i also responsible to apply rules and stones distribution among players as players doesn't know about others
+data.
 
 ### The player object
 

@@ -51,15 +51,16 @@ public class Player {
      * Plays the selected index and returns the number of stones that should
      * be passed to next player.
      *
-     * @return playResult - SimpleEntry<Integer, Boolean>
-     * the value (boolean) means if user did a perfect movement (last stone in house)
-     * the key (int):
-     * 0: no stones should be passed to other player nor capture movement.
-     * +1: the number of stones for following user
-     * -1: the index of a house's capture.
-     * This is when last stone was in an empty pits owned by this player.
+     * @return playResult  {@link PlayResult}
+     *  - isPerfectMove?
+     *  - isCaptureMove?
+     *  - remainingStones
+     *  - captureMoveIndexPit
      */
     final public PlayResult play(int indexPit) throws BadAttributeValueExpException {
+        PlayResult.Builder builder = PlayResult.builder();
+
+
         if (this.pits[indexPit] == 0) {
             logger.error("Attempt to play in an empty pit; Index: " + indexPit);
             throw new BadAttributeValueExpException("Invalid move!");
@@ -72,20 +73,21 @@ public class Player {
             // we check if the pit is empty and is the last stone
             // indicating that this is a capture!
             if (this.pits[i] == 0 && totalStonesToDistribute == 1) {
-                totalStonesToDistribute = -i;
-            } else {
-                totalStonesToDistribute--;
+                builder.setCaptureIndex(i);
+                builder.setCaptureMovement(true);
             }
+            totalStonesToDistribute--;
             this.pits[i]++;
         }
 
         if (totalStonesToDistribute > 0) {
             this.house++;
             totalStonesToDistribute--;
+            builder.setPerfectMovement(totalStonesToDistribute == 0);
         }
+        builder.setResultantStones(totalStonesToDistribute);
 
-        boolean perfectMovement = totalStonesToDistribute == 0;
-        return new PlayResult(totalStonesToDistribute, perfectMovement);
+        return builder.createPlayResult();
     }
 
     /**
@@ -108,6 +110,20 @@ public class Player {
         return numberOfStones;
     }
 
+    final public int removeStonesFromIndex(int index) {
+        int res = this.pits[index];
+        this.pits[index] = 0;
+        return res;
+    }
+
+    /**
+     * This method is called when a capture happens. The caller is allowed to add stones into house
+     * even when they're not in player's pits.
+     * @param stones
+     */
+    final public void addIntoHouse(int stones) {
+        this.house+=stones;
+    }
 
     public void printCurrentStatus() {
         logger.info("-------");

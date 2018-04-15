@@ -16,13 +16,14 @@ import static org.assertj.core.api.Assertions.fail;
 public class GameServiceTest {
 
     private static final int INIT_STONES_SIZE = 6;
+    private static final int FIRST_PLAYER_INDEX = 0;
 
     private static GameService gameService;
 
     @BeforeClass
     public static void setupClass() {
         AppConfig config = new AppConfig();
-        config.setDefaultFirstPlayer(0);
+        config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
         config.setRulesEmptyHouse(true);
         config.setStonesNumber(INIT_STONES_SIZE);
         gameService = new GameService(config);
@@ -35,7 +36,7 @@ public class GameServiceTest {
     @Test
     public void initGame() {
         PlayersDTO dto = gameService.initGame();
-        assertThat(gameService.getCurrentPlayerRound()).isEqualTo(1);
+        assertThat(gameService.getCurrentPlayerRound()).isEqualTo(FIRST_PLAYER_INDEX);
         assertThat(dto.getPlayers()).isNotNull();
         for (int i = 0; i < GameService.NUMBER_OF_PLAYERS; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
@@ -145,31 +146,69 @@ public class GameServiceTest {
 
     /**
      * In this scenario we'll play 4 stones. The third move should result in a capture.
+     * The rule is turned on. The capture is the sum of player and next player pit stones.
      */
     @Test
     public void playerOneShouldCaptureFromPlayerTwo() throws BadAttributeValueExpException {
-        gameService.initGame();
-
         AppConfig config = new AppConfig();
-        config.setDefaultFirstPlayer(0);
+        config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
         config.setRulesEmptyHouse(true);
         config.setStonesNumber(4);
         GameService service = new GameService(config);
         service.initGame();
         service.play(Player.NUMBER_HOUSES - 2); // the one before last house
-        service.play(0); // last house
+        service.printPlayersStatus();
+        service.play(0); // the last house
         service.printPlayersStatus();
         service.play(0);
 
         assertThat(service.getPlayers()[0].getHouse()).isEqualTo(8);
-        assertThat(service.getPlayers()[0].getPits()[Player.NUMBER_HOUSES-2]).isEqualTo(8);
+        assertThat(service.getPlayers()[0].getPits()[0]).isEqualTo(0);
+        assertThat(service.getPlayers()[0].getPits()[Player.NUMBER_HOUSES - 2]).isEqualTo(0);
 
         assertThat(service.getPlayers()[1].getHouse()).isEqualTo(0);
-        assertThat(service.getPlayers()[1].getPits()[Player.NUMBER_HOUSES-2]).isEqualTo(0);
-
-
-
+        assertThat(service.getPlayers()[1].getPits()[0]).isEqualTo(0);
+        assertThat(service.getPlayers()[1].getPits()[1]).isEqualTo(0); // the house stealled!
     }
+
+    /**
+     * In this scenario we'll play 4 stones. The third move should result in a capture.
+     * The rule is turned OFF. The capture is only it's own pit.
+     */
+    @Test
+    public void playerOneShouldCaptureOnlyItsOwn() throws BadAttributeValueExpException {
+        AppConfig config = new AppConfig();
+        config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
+        config.setRulesEmptyHouse(false);
+        config.setStonesNumber(4);
+        GameService service = new GameService(config);
+        service.initGame();
+        service.play(Player.NUMBER_HOUSES - 2); // the one before last house
+        service.printPlayersStatus();
+        service.play(0); // the last house
+        service.printPlayersStatus();
+        service.play(0);
+
+        assertThat(service.getPlayers()[0].getHouse()).isEqualTo(2);
+        assertThat(service.getPlayers()[0].getPits()[0]).isEqualTo(0);
+        assertThat(service.getPlayers()[0].getPits()[Player.NUMBER_HOUSES - 2]).isEqualTo(0);
+
+        assertThat(service.getPlayers()[1].getHouse()).isEqualTo(0);
+        assertThat(service.getPlayers()[1].getPits()[0]).isEqualTo(0);
+        assertThat(service.getPlayers()[1].getPits()[1]).isEqualTo(6); // opponent's pit maintained!
+    }
+
+
+    @Test
+    public void verifyOppositePitIndex() {
+        assertThat(GameService.calculateOppositeIndex(0)).isEqualTo(5);
+        assertThat(GameService.calculateOppositeIndex(1)).isEqualTo(4);
+        assertThat(GameService.calculateOppositeIndex(2)).isEqualTo(3);
+        assertThat(GameService.calculateOppositeIndex(3)).isEqualTo(2);
+        assertThat(GameService.calculateOppositeIndex(4)).isEqualTo(1);
+        assertThat(GameService.calculateOppositeIndex(5)).isEqualTo(0);
+    }
+
 
     @Test
     public void gameShouldEndWhenAPlayerHasNotStonesInPitsAfterSomeMoves() {

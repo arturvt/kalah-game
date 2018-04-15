@@ -68,19 +68,25 @@ public class GameService {
     public void play(int indexPit) throws BadAttributeValueExpException {
         logger.info(String.format("[%d] - plays pit -> %d", this.currentPlayerRound, indexPit));
 
+        PlayResult playResult = this.players[this.currentPlayerRound].play(indexPit);
+
+        boolean switchPlayer = true;
+        if (playResult.isPerfectMovement()) {
+            logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
+            switchPlayer = false;
+        } else if (playResult.isCaptureMovement()) {
+            captureStones(playResult.getCaptureIndex());
+        } else if (playResult.getResultantStones() > 0) {
+            distributeStones(playResult.getResultantStones());
+
+        }
+        if (switchPlayer) {
+            switchPlayer();
+        }
+
         if (hasGameEnded()) {
             logger.info("End Game!");
             logger.info("Checking the winner...");
-        } else {
-            PlayResult playResult = this.players[this.currentPlayerRound].play(indexPit);
-
-            if (playResult.isPerfectMovement()) {
-                logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
-            } else if (playResult.getResultantStones() > 0) {
-                distributeStones(playResult.getResultantStones());
-            } else {
-                captureStones(-playResult.getResultantStones());
-            }
         }
     }
 
@@ -110,7 +116,6 @@ public class GameService {
             playResult = addStonesToNextPlayer(playResult);
             playResult = addStonesToCurrentPlayer(playResult);
         }
-        switchPlayer();
     }
 
     private int addStonesToNextPlayer(int stones) {
@@ -121,17 +126,31 @@ public class GameService {
         return this.players[currentPlayerRound].distributeStones(stones, true);
     }
 
+    /**
+     * @param indexPit
+     */
     private void captureStones(int indexPit) {
-        switchPlayer();
-        //TODO: Implement this.
-        // It should check if capture is allowed.
-        // It should send user's indexPit to house.
+        // remove stones from a pit and sends them to house.
+        int currentPlayerCapture = this.players[currentPlayerRound].removeStonesFromIndex(indexPit);
+        this.players[currentPlayerRound].addIntoHouse(currentPlayerCapture);
+
+        // When this is on, capture's opponent as well.
+        if (gameConfig.isRuleEmptyHouse()) {
+            int opponentCapturedStones = this.players[getNextPlayerIndex()]
+                    .removeStonesFromIndex(calculateOppositeIndex(indexPit));
+            this.players[currentPlayerRound].addIntoHouse(opponentCapturedStones);
+        }
     }
 
-    //TODO: implement this
-    private void updateNextPlayer() {
-        // nothing now.
+    /**
+     * This method calculates the index number of opposite pit by a given current index.
+     * @param currentIndex
+     * @return
+     */
+    public static int calculateOppositeIndex(int currentIndex) {
+        return -(currentIndex - (Player.NUMBER_HOUSES - 1));
     }
+
 
     public boolean hasGameEnded() {
         return Arrays.stream(this.players).anyMatch(Player::hasAllPitsEmpty);
