@@ -31,8 +31,6 @@ public class GameServiceTest {
      */
     @Test
     public void initGame() {
-        // it starts null.
-        assertThat(gameService.getCurrentPlayerRound()).isNull();
         PlayersDTO dto = gameService.initGame();
         assertThat(gameService.getCurrentPlayerRound()).isEqualTo(1);
         assertThat(dto.getPlayers()).isNotNull();
