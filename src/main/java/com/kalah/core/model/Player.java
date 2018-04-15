@@ -92,20 +92,18 @@ public class Player {
     /**
      * Distributes stones around player pits.
      * Returns the resultant number.
+     *
      * @param numberOfStones
      * @return resultant number of stones - int
      */
     final public int distributeStones(int numberOfStones) {
-        for(int i = 0; i < NUMBER_HOUSES && numberOfStones > 0; i++) {
+        for (int i = 0; i < NUMBER_HOUSES && numberOfStones > 0; i++) {
             this.pits[i]++;
-            numberOfStones--;
-        }
-        if (numberOfStones > 0) {
-            this.house++;
             numberOfStones--;
         }
         return numberOfStones;
     }
+
 
     public void printCurrentStatus() {
         logger.info("-------");

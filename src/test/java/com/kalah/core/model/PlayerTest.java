@@ -62,7 +62,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void shouldDistributeStonesAndIncrementHouseWithResultant() {
+    public void shouldDistributeStonesInPitsAndDoNotUpdateHouse() {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 10;
         int result = p.distributeStones(numberOfStones);
@@ -76,8 +76,8 @@ public class PlayerTest {
 
         p.printCurrentStatus();
         assertThat(allPitsIncreased).isTrue();
-        assertThat(p.getHouse()).isEqualTo(1);
-        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES + 1); // we add the house here
+        assertThat(p.getHouse()).isEqualTo(0);
+        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES); // we add the house here
         assertThat(result).isEqualTo(expectedResultant);
     }
 
@@ -86,7 +86,7 @@ public class PlayerTest {
      * this method shall fill once and return the resultant.
      */
     @Test
-    public void shouldDistributeStonesAndIncrementHouseWithResultantEvenWithHighNumberStones() {
+    public void shouldDistributeStonesAndDoNotUpdateHouseWithResultantEvenWithHighNumberStones() {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 100; // Higher number!
         int result = p.distributeStones(numberOfStones);
@@ -100,8 +100,8 @@ public class PlayerTest {
 
         p.printCurrentStatus();
         assertThat(allPitsIncreased).isTrue();
-        assertThat(p.getHouse()).isEqualTo(1);
-        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES + 1); // we add the house here
+        assertThat(p.getHouse()).isEqualTo(0);
+        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES ); // we add the house here
         assertThat(result).isEqualTo(expectedResultant);
     }
 
