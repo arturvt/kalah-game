@@ -2,29 +2,23 @@ package com.kalah.core.model;
 
 import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
-import com.kalah.core.dto.PlayersDTO;
 import com.kalah.core.exceptions.BadMovementException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Date;
 
 
-@Service
-public class GameService {
+public class Game {
     private static final int NUMBER_OF_PLAYERS = 2;
-    final private static Log logger = LogFactory.getLog(GameService.class);
+    final private static Log logger = LogFactory.getLog(Game.class);
     final private AppConfig gameConfig;
     private GameStatus gameStatus;
     private Integer currentPlayerRound = null;
 
     private Player[] players;
 
-    @Autowired
-    public GameService(AppConfig gameConfig) {
+    public Game(AppConfig gameConfig) {
         this.gameConfig = gameConfig;
         this.gameStatus = GameStatus.NOT_STARTED;
     }
@@ -42,7 +36,7 @@ public class GameService {
     /**
      * Creates a new game, with default stones for every player.
      */
-    public PlayersDTO initGame() {
+    public void initGame() {
         logger.info("Starting a new game.");
         this.currentPlayerRound = gameConfig.getDefaultFirstPlayer();
         this.players = new Player[NUMBER_OF_PLAYERS];
@@ -50,10 +44,6 @@ public class GameService {
         this.players[1] = new Player("Player 02", gameConfig.getNumberStones());
         this.gameStatus = GameStatus.RUNNING;
         logger.info("First round: " + this.players[this.currentPlayerRound].getPlayerName());
-        return PlayersDTO.builder()
-                .setLastUpdate(new Date())
-                .setPlayers(this.players)
-                .createPlayersDTO();
     }
 
     final public Integer getCurrentPlayerRound() {
