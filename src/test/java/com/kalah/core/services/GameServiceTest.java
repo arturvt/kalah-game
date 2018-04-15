@@ -87,23 +87,52 @@ public class GameServiceTest {
 
     }
 
+    /**
+     * This is a complext scenario. The last movement should be from player 2 and result in a capture.
+     * The tricky part is that the capture happens after one loop of distribution among players, as moved pit have 13
+     * stones. Is expected that it adds stones into player 2 house, all pits from player one and two and capture
+     * the content of 1st pit from player one.
+     */
     @Test
-    public void shouldCaptureWhenReachLastMovement() {
+    public void shouldCaptureWhenReachLastMovement() throws BadAttributeValueExpException {
         gameService.initGame();
         Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
         Player p2 = gameService.getPlayers()[gameService.getNextPlayerIndex()];
-        // Should not start from the first as by now the number of houses is the same as stones
+
+        // Preparing the environment
         IntStream.range(1, Player.NUMBER_HOUSES).forEach(index -> {
             try {
-                gameService.play(index);
+                gameService.play(index); // p1
                 gameService.printPlayersStatus();
-                gameService.play(index);
+                if (index == Player.NUMBER_HOUSES-1) {
+                    System.out.println("-----------");
+                    return;
+                }
+                gameService.play(index); // p2
                 gameService.printPlayersStatus();
             } catch (BadAttributeValueExpException e) {
                 fail("This house shouldn't be empty!");
             }
-
         });
+
+        // Check if the scenario is what we want.
+        assertThat(p1.getHouse()).isEqualTo(5);
+        assertThat(p1.getPits()[0]).isEqualTo(12);
+        assertThat(p1.getPits()[1]).isEqualTo(5);
+        assertThat(p1.getPits()[2]).isEqualTo(4);
+        assertThat(p1.getPits()[3]).isEqualTo(3);
+        assertThat(p1.getPits()[4]).isEqualTo(2);
+        assertThat(p1.getPits()[5]).isEqualTo(0);
+
+        assertThat(p2.getHouse()).isEqualTo(4);
+        assertThat(p2.getPits()[0]).isEqualTo(12);
+        assertThat(p2.getPits()[1]).isEqualTo(5);
+        assertThat(p2.getPits()[2]).isEqualTo(4);
+        assertThat(p2.getPits()[3]).isEqualTo(2);
+        assertThat(p2.getPits()[4]).isEqualTo(1);
+        assertThat(p2.getPits()[5]).isEqualTo(13);
+
+        gameService.play(Player.NUMBER_HOUSES-1); // now the movement.
 
         // With this scenario, last movement makes a great capture. Checking if it happens.
         assertThat(p1.getHouse()).isEqualTo(5);

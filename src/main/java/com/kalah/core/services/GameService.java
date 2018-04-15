@@ -81,15 +81,16 @@ public class GameService {
         PlayResult playResult = this.players[this.currentPlayerRound].play(indexPit);
 
         boolean switchPlayer = true;
+
+        distributeStones(playResult.getResultantStones());
+
         if (playResult.isPerfectMovement()) {
             logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
             switchPlayer = false;
         } else if (playResult.isCaptureMovement()) {
             captureStones(playResult.getCaptureIndex());
-        } else if (playResult.getResultantStones() > 0) {
-            distributeStones(playResult.getResultantStones());
-
         }
+
         if (switchPlayer) {
             switchPlayer();
         }
@@ -116,12 +117,12 @@ public class GameService {
 
     /**
      * Distribute stones among players.
-     * Current player should aways add into it's house if remaining reaches there.
+     * Return missing distributed stones.
      *
-     * @param playResult
+     * @param playResult - number of stones to be distributed
      */
     private void distributeStones(int playResult) {
-        while (playResult != 0) {
+        while(playResult != 0) {
             playResult = addStonesToNextPlayer(playResult);
             playResult = addStonesToCurrentPlayer(playResult);
         }

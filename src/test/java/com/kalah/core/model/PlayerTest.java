@@ -214,4 +214,32 @@ public class PlayerTest {
 
     }
 
+    /**
+     * A play in a house with a large amount of stones must distribute and confirm if it is or not a capture.
+     * In this scenario, it's a capture but opponents must receive the resultant stones.
+     * @throws BadAttributeValueExpException
+     */
+    @Test
+    public void shouldDistributeAndReturnAndCapture() throws BadAttributeValueExpException {
+        Player p = new Player(P_NAME, 0);
+        p.getPits()[0] = 1;
+        p.getPits()[1] = 5;
+        p.getPits()[2] = 4;
+        p.getPits()[3] = 2;
+        p.getPits()[4] = 1;
+        p.getPits()[5] = 13;
+        PlayResult playResult = p.play(5);
+
+        assertThat(playResult.isCaptureMovement()).isTrue();
+        assertThat(playResult.isPerfectMovement()).isFalse();
+        assertThat(playResult.getResultantStones()).isEqualTo(12);
+        assertThat(playResult.getCaptureIndex()).isEqualTo(5);
+        assertThat(p.getPits()[0]).isEqualTo(1);
+        assertThat(p.getPits()[1]).isEqualTo(5);
+        assertThat(p.getPits()[2]).isEqualTo(4);
+        assertThat(p.getPits()[3]).isEqualTo(2);
+        assertThat(p.getPits()[4]).isEqualTo(1);
+        assertThat(p.getPits()[5]).isEqualTo(0);
+        assertThat(p.getHouse()).isEqualTo(1);
+    }
 }

@@ -52,10 +52,10 @@ public class Player {
      * be passed to next player.
      *
      * @return playResult  {@link PlayResult}
-     *  - isPerfectMove?
-     *  - isCaptureMove?
-     *  - remainingStones
-     *  - captureMoveIndexPit
+     * - isPerfectMove?
+     * - isCaptureMove?
+     * - remainingStones
+     * - captureMoveIndexPit
      */
     final public PlayResult play(int indexPit) throws BadAttributeValueExpException {
         PlayResult.Builder builder = PlayResult.builder();
@@ -68,6 +68,13 @@ public class Player {
 
         int totalStonesToDistribute = this.pits[indexPit];
         this.pits[indexPit] = 0;
+
+        // This will always make a capture movement as it rotates the entire opponent and ends in the just empty
+        // pit
+        if (totalStonesToDistribute == Player.NUMBER_HOUSES * 2 + 1) {
+            builder.setCaptureIndex(indexPit);
+            builder.setCaptureMovement(true);
+        }
 
         for (int i = indexPit + 1; i < NUMBER_HOUSES && totalStonesToDistribute > 0; i++) {
             // we check if the pit is empty and is the last stone
@@ -119,10 +126,11 @@ public class Player {
     /**
      * This method is called when a capture happens. The caller is allowed to add stones into house
      * even when they're not in player's pits.
+     *
      * @param stones
      */
     final public void addIntoHouse(int stones) {
-        this.house+=stones;
+        this.house += stones;
     }
 
     public void printCurrentStatus() {
