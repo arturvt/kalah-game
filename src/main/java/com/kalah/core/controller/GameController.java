@@ -1,7 +1,7 @@
 package com.kalah.core.controller;
 
 import com.kalah.core.dto.PlayersDTO;
-import com.kalah.core.services.GameService;
+import com.kalah.core.model.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,11 +1,9 @@
-package com.kalah.core.services;
+package com.kalah.core.model;
 
 import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
 import com.kalah.core.exceptions.BadMovementException;
-import com.kalah.core.model.PlayResult;
-import com.kalah.core.model.Player;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

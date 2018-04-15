@@ -4,6 +4,7 @@ import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
 import com.kalah.core.exceptions.BadMovementException;
+import com.kalah.core.model.GameService;
 import com.kalah.core.model.Player;
 import org.junit.BeforeClass;
 import org.junit.Test;
