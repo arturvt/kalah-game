@@ -31,6 +31,16 @@ public class GameService {
     }
 
     /**
+     * This method calculates the index number of opposite pit by a given current index.
+     *
+     * @param currentIndex
+     * @return
+     */
+    public static int calculateOppositeIndex(int currentIndex) {
+        return -(currentIndex - (Player.NUMBER_HOUSES - 1));
+    }
+
+    /**
      * Creates a new game, with default stones for every player.
      */
     public PlayersDTO initGame() {
@@ -95,14 +105,13 @@ public class GameService {
         logger.info(String.format("[%d] - is the next player", this.currentPlayerRound));
     }
 
-
     public int getNextPlayerIndex() {
         return this.currentPlayerRound == 0 ? 1 : 0;
     }
 
     public void printPlayersStatus() {
-        this.players[0].printCurrentStatus();
-        this.players[1].printCurrentStatus();
+        getCurrentPlayer().printCurrentStatus();
+        getNextPlayer().printCurrentStatus();
     }
 
     /**
@@ -119,11 +128,11 @@ public class GameService {
     }
 
     private int addStonesToNextPlayer(int stones) {
-        return this.players[getNextPlayerIndex()].distributeStones(stones, false);
+        return getNextPlayer().distributeStones(stones, false);
     }
 
     private int addStonesToCurrentPlayer(int stones) {
-        return this.players[currentPlayerRound].distributeStones(stones, true);
+        return getCurrentPlayer().distributeStones(stones, true);
     }
 
     /**
@@ -131,26 +140,23 @@ public class GameService {
      */
     private void captureStones(int indexPit) {
         // remove stones from a pit and sends them to house.
-        int currentPlayerCapture = this.players[currentPlayerRound].removeStonesFromIndex(indexPit);
-        this.players[currentPlayerRound].addIntoHouse(currentPlayerCapture);
+        int currentPlayerCapture = getCurrentPlayer().removeStonesFromIndex(indexPit);
+        getCurrentPlayer().addIntoHouse(currentPlayerCapture);
 
         // When this is on, capture's opponent as well.
         if (gameConfig.isRuleEmptyHouse()) {
-            int opponentCapturedStones = this.players[getNextPlayerIndex()]
-                    .removeStonesFromIndex(calculateOppositeIndex(indexPit));
-            this.players[currentPlayerRound].addIntoHouse(opponentCapturedStones);
+            int opponentCapturedStones = getNextPlayer().removeStonesFromIndex(calculateOppositeIndex(indexPit));
+            getCurrentPlayer().addIntoHouse(opponentCapturedStones);
         }
     }
 
-    /**
-     * This method calculates the index number of opposite pit by a given current index.
-     * @param currentIndex
-     * @return
-     */
-    public static int calculateOppositeIndex(int currentIndex) {
-        return -(currentIndex - (Player.NUMBER_HOUSES - 1));
+    private Player getCurrentPlayer() {
+        return this.players[currentPlayerRound];
     }
 
+    private Player getNextPlayer() {
+        return this.players[getNextPlayerIndex()];
+    }
 
     public boolean hasGameEnded() {
         return Arrays.stream(this.players).anyMatch(Player::hasAllPitsEmpty);

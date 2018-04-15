@@ -98,7 +98,6 @@ public class GameServiceTest {
                 gameService.play(index);
                 gameService.printPlayersStatus();
                 gameService.play(index);
-                //TODO: Falta implementar a captura!
                 gameService.printPlayersStatus();
             } catch (BadAttributeValueExpException e) {
                 fail("This house shouldn't be empty!");
