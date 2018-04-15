@@ -50,13 +50,13 @@ public class PlayerTest {
         boolean justInitialChange = IntStream.range(0, numberOfStones - 1)
                 .allMatch(i -> p.getPits()[i] == STONE_SIZE + 1);
 
-        boolean missingDidntChange = IntStream.range(numberOfStones, Player.NUMBER_HOUSES - 1)
+        boolean missingDidNotChange= IntStream.range(numberOfStones, Player.NUMBER_HOUSES - 1)
                 .allMatch(i -> p.getPits()[i] == STONE_SIZE);
 
         p.printCurrentStatus();
         assertThat(result).isEqualTo(0); // no resultant stones
         assertThat(justInitialChange).isTrue();
-        assertThat(missingDidntChange).isTrue();
+        assertThat(missingDidNotChange).isTrue();
         assertThat(p.getHouse()).isEqualTo(0); // it shouldn't reach house
 
     }

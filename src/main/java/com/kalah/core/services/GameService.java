@@ -45,7 +45,7 @@ public class GameService {
                 .createPlayersDTO();
     }
 
-    public Integer getCurrentPlayerRound() {
+    final public Integer getCurrentPlayerRound() {
         return currentPlayerRound;
     }
 

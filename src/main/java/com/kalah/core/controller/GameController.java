@@ -22,7 +22,7 @@ public class GameController {
     @RequestMapping("/")
     @ResponseBody
     String home() {
-        return "Hello from backbase!";
+        return "Hello from kalah!";
     }
 
     @RequestMapping("/init")

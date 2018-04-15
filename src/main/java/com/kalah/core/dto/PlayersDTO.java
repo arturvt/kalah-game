@@ -6,17 +6,19 @@ import com.kalah.core.model.Player;
 import java.util.Date;
 
 public class PlayersDTO {
-    @JsonProperty("lastUpdate")
-    private Date lastUpdate;
-
     @JsonProperty("players")
-    private Player[] players;
+    private final Player[] players;
+    @JsonProperty("lastUpdate")
+    private final Date lastUpdate;
 
     private PlayersDTO(Date lastUpdate, Player[] players) {
         this.lastUpdate = lastUpdate;
         this.players = players;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
     final public Date getLastUpdate() {
         return lastUpdate;
@@ -25,11 +27,6 @@ public class PlayersDTO {
     final public Player[] getPlayers() {
         return players;
     }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
 
     public static class Builder {
         private Date lastUpdate;

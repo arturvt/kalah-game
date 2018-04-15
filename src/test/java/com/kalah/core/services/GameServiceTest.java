@@ -38,9 +38,7 @@ public class GameServiceTest {
         assertThat(dto.getPlayers()).isNotNull();
         for (int i = 0; i < GameService.NUMBER_OF_PLAYERS; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
-            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> {
-                assertThat(pit).isEqualTo(INIT_STONES_SIZE);
-            });
+            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(INIT_STONES_SIZE));
         }
     }
 

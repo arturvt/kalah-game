@@ -12,9 +12,9 @@ public class Player {
     final private static Log logger = LogFactory.getLog(Player.class);
 
     @JsonProperty("playerName")
-    private String playerName;
+    private final String playerName;
     @JsonProperty("pits")
-    private int[] pits;
+    private final int[] pits;
     @JsonProperty("house")
     private int house;
 
