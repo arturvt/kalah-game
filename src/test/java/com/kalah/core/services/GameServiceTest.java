@@ -3,11 +3,11 @@ package com.kalah.core.services;
 import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.exceptions.BadMovementException;
 import com.kalah.core.model.Player;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -55,7 +55,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void shouldSwitchPlayerWhenSimplePlay() throws BadAttributeValueExpException {
+    public void shouldSwitchPlayerWhenSimplePlay() throws BadMovementException {
         gameService.initGame();
         Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
         // Sanity check
@@ -104,7 +104,7 @@ public class GameServiceTest {
      * the content of 1st pit from player one.
      */
     @Test
-    public void shouldCaptureWhenReachLastMovement() throws BadAttributeValueExpException {
+    public void shouldCaptureWhenReachLastMovement() throws BadMovementException {
         gameService.initGame();
         Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
         Player p2 = gameService.getPlayers()[gameService.getNextPlayerIndex()];
@@ -120,7 +120,7 @@ public class GameServiceTest {
                 }
                 gameService.play(index); // p2
                 gameService.printPlayersStatus();
-            } catch (BadAttributeValueExpException e) {
+            } catch (BadMovementException e) {
                 fail("This house shouldn't be empty!");
             }
         });
@@ -187,7 +187,7 @@ public class GameServiceTest {
      * The rule is turned on. The capture is the sum of player and next player pit stones.
      */
     @Test
-    public void playerOneShouldCaptureFromPlayerTwo() throws BadAttributeValueExpException {
+    public void playerOneShouldCaptureFromPlayerTwo() throws BadMovementException {
         AppConfig config = new AppConfig();
         config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
         config.setRulesEmptyHouse(true);
@@ -214,7 +214,7 @@ public class GameServiceTest {
      * The rule is turned OFF. The capture is only it's own pit.
      */
     @Test
-    public void playerOneShouldCaptureOnlyItsOwn() throws BadAttributeValueExpException {
+    public void playerOneShouldCaptureOnlyItsOwn() throws BadMovementException {
         AppConfig config = new AppConfig();
         config.setDefaultFirstPlayer(FIRST_PLAYER_INDEX);
         config.setRulesEmptyHouse(false);
@@ -256,7 +256,7 @@ public class GameServiceTest {
             int index = random.nextInt(Player.NUMBER_HOUSES);
             try {
                 gameService.play(index);
-            } catch (BadAttributeValueExpException e) {
+            } catch (BadMovementException e) {
                 // ignores.
             }
         }

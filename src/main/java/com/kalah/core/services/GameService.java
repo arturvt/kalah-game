@@ -3,6 +3,7 @@ package com.kalah.core.services;
 import com.kalah.core.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.exceptions.BadMovementException;
 import com.kalah.core.model.PlayResult;
 import com.kalah.core.model.Player;
 import org.apache.commons.logging.Log;
@@ -10,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -20,7 +20,7 @@ public class GameService {
     private static final int NUMBER_OF_PLAYERS = 2;
     final private static Log logger = LogFactory.getLog(GameService.class);
     final private AppConfig gameConfig;
-    private GameStatus gameStatus = GameStatus.NOT_STARTED;
+    private GameStatus gameStatus;
     private Integer currentPlayerRound = null;
 
     private Player[] players;
@@ -77,7 +77,7 @@ public class GameService {
      *
      * @param indexPit
      */
-    public void play(int indexPit) throws BadAttributeValueExpException {
+    public void play(int indexPit) throws BadMovementException {
         logger.info(String.format("[%d] - plays pit -> %d", this.currentPlayerRound, indexPit));
 
         PlayResult playResult = this.players[this.currentPlayerRound].play(indexPit);

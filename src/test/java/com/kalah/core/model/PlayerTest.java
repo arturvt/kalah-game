@@ -1,8 +1,8 @@
 package com.kalah.core.model;
 
+import com.kalah.core.exceptions.BadMovementException;
 import org.junit.Test;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -21,7 +21,7 @@ public class PlayerTest {
 
 
     @Test
-    public void shouldBeAPerfectMovement() throws BadAttributeValueExpException {
+    public void shouldBeAPerfectMovement() throws BadMovementException {
         // A player starting with 6 stones
         Player p = new Player(P_NAME, STONE_SIZE);
         // Play last house
@@ -169,7 +169,7 @@ public class PlayerTest {
         Player p = new Player(P_NAME, 1);
         try {
             p.play(2);
-        } catch (BadAttributeValueExpException e) {
+        } catch (BadMovementException e) {
             // ignore
             fail("Should not throw right now!");
         }
@@ -177,7 +177,7 @@ public class PlayerTest {
         // Running twice at the same pit will throw an exception as this pit should be empty.
         Throwable thrown = catchThrowable(() -> p.play(2));
 
-        assertThat(thrown).isInstanceOf(BadAttributeValueExpException.class)
+        assertThat(thrown).isInstanceOf(BadMovementException.class)
                 .hasNoCause();
 
     }
@@ -187,10 +187,10 @@ public class PlayerTest {
      * distribute properly, including the last and empty pit, but return the index of the pit where capture
      * can be applied.
      *
-     * @throws BadAttributeValueExpException
+     * @throws BadMovementException
      */
     @Test
-    public void shouldDistributeAndReturnIsCapture() throws BadAttributeValueExpException {
+    public void shouldDistributeAndReturnIsCapture() throws BadMovementException {
         Player p = new Player(P_NAME, 2);
 
         int indexPitWillBeEmpty = Player.NUMBER_HOUSES - 1;
@@ -217,10 +217,11 @@ public class PlayerTest {
     /**
      * A play in a house with a large amount of stones must distribute and confirm if it is or not a capture.
      * In this scenario, it's a capture but opponents must receive the resultant stones.
-     * @throws BadAttributeValueExpException
+     *
+     * @throws BadMovementException
      */
     @Test
-    public void shouldDistributeAndReturnAndCapture() throws BadAttributeValueExpException {
+    public void shouldDistributeAndReturnAndCapture() throws BadMovementException {
         Player p = new Player(P_NAME, 0);
         p.getPits()[0] = 1;
         p.getPits()[1] = 5;
@@ -244,14 +245,14 @@ public class PlayerTest {
     }
 
     @Test
-    public void shouldRemoveAllMissingStones() throws BadAttributeValueExpException {
+    public void shouldRemoveAllMissingStones() throws BadMovementException {
         Player p = new Player(P_NAME, STONE_SIZE);
-        p.play(Player.NUMBER_HOUSES-1);
-        p.play(Player.NUMBER_HOUSES-2);
+        p.play(Player.NUMBER_HOUSES - 1);
+        p.play(Player.NUMBER_HOUSES - 2);
         int numberOfStones = p.removeAllStones();
-        IntStream.range(0, Player.NUMBER_HOUSES-1).forEach(i -> assertThat(p.getPits()[i]).isEqualTo(0));
+        IntStream.range(0, Player.NUMBER_HOUSES - 1).forEach(i -> assertThat(p.getPits()[i]).isEqualTo(0));
 
-        int shouldHave = STONE_SIZE * (Player.NUMBER_HOUSES-2) + 1;
+        int shouldHave = STONE_SIZE * (Player.NUMBER_HOUSES - 2) + 1;
         assertThat(numberOfStones).isEqualTo(shouldHave);
     }
 }

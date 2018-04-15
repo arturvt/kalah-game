@@ -1,12 +1,11 @@
 package com.kalah.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kalah.core.exceptions.BadMovementException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 public class Player {
     public static final int NUMBER_HOUSES = 6;
@@ -56,13 +55,13 @@ public class Player {
      * - remainingStones
      * - captureMoveIndexPit
      */
-    final public PlayResult play(int indexPit) throws BadAttributeValueExpException {
+    final public PlayResult play(int indexPit) throws BadMovementException {
         PlayResult.Builder builder = PlayResult.builder();
 
 
         if (this.pits[indexPit] == 0) {
             logger.error("Attempt to play in an empty pit; Index: " + indexPit);
-            throw new BadAttributeValueExpException("Invalid move!");
+            throw new BadMovementException(indexPit);
         }
 
         int totalStonesToDistribute = this.pits[indexPit];
