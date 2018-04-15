@@ -51,6 +51,7 @@ public class GameService {
 
     /**
      * This getter should only be used for testing purposes. Only this
+     *
      * @return
      */
     public Player[] getPlayers() {
@@ -75,29 +76,51 @@ public class GameService {
             if (playResult == 0) {
                 logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
             } else if (playResult > 0) {
-                addStonesToNextPlayer(playResult);
-                switchPlayer();
+                distributeStones(playResult);
             } else {
                 captureStones(-playResult);
-                switchPlayer();
             }
         }
     }
 
     private void switchPlayer() {
-        if (this.currentPlayerRound == 0) {
-            this.currentPlayerRound = 1;
-        } else {
-            this.currentPlayerRound =1;
-        }
+        this.currentPlayerRound = getNextPlayerIndex();
         logger.info(String.format("[%d] - is the next player", this.currentPlayerRound));
     }
 
-    private void addStonesToNextPlayer(int stones) {
-        //TODO: Implement this
+
+    private int getNextPlayerIndex() {
+        return this.currentPlayerRound == 0 ? 1 : 0;
+    }
+
+    public void printPlayersStatus() {
+        this.players[0].printCurrentStatus();
+        this.players[1].printCurrentStatus();
+    }
+
+    /**
+     * Distribute stones among players.
+     * Current player should aways add into it's house if remaining reaches there.
+     * @param playResult
+     */
+    private void distributeStones(int playResult) {
+        while (playResult != 0) {
+            playResult = addStonesToNextPlayer(playResult);
+            playResult = addStonesToCurrentPlayer(playResult);
+        }
+        switchPlayer();
+    }
+
+    private int addStonesToNextPlayer(int stones) {
+        return this.players[getNextPlayerIndex()].distributeStones(stones, false);
+    }
+
+    private int addStonesToCurrentPlayer(int stones) {
+        return this.players[currentPlayerRound].distributeStones(stones, true);
     }
 
     private void captureStones(int indexPit) {
+        switchPlayer();
         //TODO: Implement this.
         // It should check if capture is allowed.
         // It should send user's indexPit to house.

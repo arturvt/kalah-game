@@ -42,7 +42,7 @@ public class PlayerTest {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 4;
 
-        int result = p.distributeStones(numberOfStones);
+        int result = p.distributeStones(numberOfStones, false);
 
         // just to make sure that this test is valid
         assertThat(numberOfStones).isLessThan(Player.NUMBER_HOUSES - 1);
@@ -50,7 +50,7 @@ public class PlayerTest {
         boolean justInitialChange = IntStream.range(0, numberOfStones - 1)
                 .allMatch(i -> p.getPits()[i] == STONE_SIZE + 1);
 
-        boolean missingDidNotChange= IntStream.range(numberOfStones, Player.NUMBER_HOUSES - 1)
+        boolean missingDidNotChange = IntStream.range(numberOfStones, Player.NUMBER_HOUSES - 1)
                 .allMatch(i -> p.getPits()[i] == STONE_SIZE);
 
         p.printCurrentStatus();
@@ -65,7 +65,7 @@ public class PlayerTest {
     public void shouldDistributeStonesInPitsAndDoNotUpdateHouse() {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 10;
-        int result = p.distributeStones(numberOfStones);
+        int result = p.distributeStones(numberOfStones, false);
 
         // just to make sure that this test is valid
         assertThat(numberOfStones).isGreaterThan(Player.NUMBER_HOUSES - 1);
@@ -89,7 +89,7 @@ public class PlayerTest {
     public void shouldDistributeStonesAndDoNotUpdateHouseWithResultantEvenWithHighNumberStones() {
         Player p = new Player(P_NAME, STONE_SIZE);
         int numberOfStones = 100; // Higher number!
-        int result = p.distributeStones(numberOfStones);
+        int result = p.distributeStones(numberOfStones, false);
 
         // just to make sure that this test is valid
         assertThat(numberOfStones).isGreaterThan(Player.NUMBER_HOUSES - 1);
@@ -101,8 +101,46 @@ public class PlayerTest {
         p.printCurrentStatus();
         assertThat(allPitsIncreased).isTrue();
         assertThat(p.getHouse()).isEqualTo(0);
-        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES ); // we add the house here
+        int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES); // we add the house here
         assertThat(result).isEqualTo(expectedResultant);
+    }
+
+    /**
+     * In this scenario, we want to distribute stones in a current user that just
+     * played a pit with a large amount of stones. It should update house more than once.
+     */
+    @Test
+    public void shouldUpdateHouseAsLongAsStonesRequires() {
+        Player p = new Player(P_NAME, STONE_SIZE);
+        int times = 5;
+        int numberOfStones = STONE_SIZE * times; // Higher number!
+
+        int rounds = 0;
+        while (numberOfStones != 0) {
+            rounds++;
+            boolean shouldCheckAll = numberOfStones > Player.NUMBER_HOUSES;
+            int numberOfPitsChanged = numberOfStones;
+            numberOfStones = p.distributeStones(numberOfStones, true);
+            p.printCurrentStatus();
+
+            // it will cover all pits and house
+            if (shouldCheckAll) {
+                for (int i = 0; i < Player.NUMBER_HOUSES; i++) {
+                    assertThat(p.getPits()[i] == STONE_SIZE + rounds).isTrue();
+                }
+                assertThat(p.getHouse()).isEqualTo(rounds);
+            } else {
+                // now only a few pits are going to be affected, no house.
+                assertThat(p.getHouse()).isEqualTo(rounds - 1);
+                for (int i = 0; i < numberOfPitsChanged; i++) {
+                    assertThat(p.getPits()[i] == STONE_SIZE + rounds).isTrue();
+                }
+
+                for (int i = numberOfPitsChanged; i < Player.NUMBER_HOUSES; i++) {
+                    assertThat(p.getPits()[i] == STONE_SIZE + (rounds - 1)).isTrue();
+                }
+            }
+        }
     }
 
     @Test
@@ -127,7 +165,7 @@ public class PlayerTest {
     public void shouldCaptureWhenDistributionEndsInAnEmptyPit() throws BadAttributeValueExpException {
         Player p = new Player(P_NAME, 2);
 
-        int indexPitWillBeEmpty = Player.NUMBER_HOUSES-1;
+        int indexPitWillBeEmpty = Player.NUMBER_HOUSES - 1;
         int indexPit = Player.NUMBER_HOUSES - 3;
 
 

@@ -92,13 +92,18 @@ public class Player {
     /**
      * Distributes stones around player pits.
      * Returns the resultant number.
+     * If shouldAddToHouse means that house can receive stones.
      *
      * @param numberOfStones
      * @return resultant number of stones - int
      */
-    final public int distributeStones(int numberOfStones) {
+    final public int distributeStones(int numberOfStones, boolean shouldAddToHouse) {
         for (int i = 0; i < NUMBER_HOUSES && numberOfStones > 0; i++) {
             this.pits[i]++;
+            numberOfStones--;
+        }
+        if (shouldAddToHouse && numberOfStones > 0) {
+            this.house++;
             numberOfStones--;
         }
         return numberOfStones;

@@ -2,13 +2,16 @@ package com.kalah.core.services;
 
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.model.Player;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class GameServiceTest {
 
@@ -41,9 +44,21 @@ public class GameServiceTest {
     }
 
     @Test
-    public void play() throws BadAttributeValueExpException {
+    public void shouldSwitchPlayerWhenSimplePlay() {
         gameService.initGame();
-        gameService.play(1);
+        // Should not start from the first as by now the number of houses is the same as stones
+        IntStream.range(1, Player.NUMBER_HOUSES-1).forEach(index -> {
+            try {
+                gameService.play(index);
+                gameService.play(index);
+                //TODO: Falta implementar a captura!
+                gameService.printPlayersStatus();
+            } catch (BadAttributeValueExpException e) {
+                fail("This house shouldn't be empty!");
+            }
+
+        });
+
     }
 
     @Test
