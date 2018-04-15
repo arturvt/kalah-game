@@ -21,20 +21,20 @@ public class PlayerTest {
 
 
     @Test
-    public void shouldReturnZeroWhenPlayEndsInHouse() throws BadAttributeValueExpException {
-        int initialStones = 1;
-        // A player with just 1 stone
-        Player p = new Player(P_NAME, initialStones);
+    public void shouldBeAPerfectMovement() throws BadAttributeValueExpException {
+        // A player starting with 6 stones
+        Player p = new Player(P_NAME, STONE_SIZE);
         // Play last house
-        int res = p.play(Player.NUMBER_HOUSES - 1);
-
-        assertThat(res).isEqualTo(0);
+        PlayResult res = p.play(0);
+        p.printCurrentStatus();
+        assertThat(res.getResultantStones()).isEqualTo(0);
+        assertThat(res.isPerfectMovement()).isEqualTo(true);
         assertThat(p.getHouse()).isEqualTo(1);
 
-        boolean justTheLastIsModified = IntStream.range(0, Player.NUMBER_HOUSES - 2)
-                .allMatch(i -> p.getPits()[i] == initialStones);
+        boolean allButFirstModified = IntStream.range(1, Player.NUMBER_HOUSES - 1)
+                .allMatch(i -> p.getPits()[i] == STONE_SIZE + 1);
 
-        assertThat(justTheLastIsModified).isTrue();
+        assertThat(allButFirstModified).isTrue();
     }
 
     @Test
@@ -161,24 +161,33 @@ public class PlayerTest {
 
     }
 
+    /**
+     * In this scenario, we'll simulate a capture. As the capture rule might change, {@link Player} should
+     * distribute properly, including the last and empty pit, but return the index of the pit where capture
+     * can be applied.
+     *
+     * @throws BadAttributeValueExpException
+     */
     @Test
-    public void shouldCaptureWhenDistributionEndsInAnEmptyPit() throws BadAttributeValueExpException {
+    public void shouldDistributeAndReturnNegativeIndicatingCapture() throws BadAttributeValueExpException {
         Player p = new Player(P_NAME, 2);
 
         int indexPitWillBeEmpty = Player.NUMBER_HOUSES - 1;
         int indexPit = Player.NUMBER_HOUSES - 3;
 
+        PlayResult playResult = p.play(indexPitWillBeEmpty);
 
         // last house, one for Home, one for next player.
-        assertThat(p.play(indexPitWillBeEmpty)).isEqualTo(1);
+        assertThat(playResult.getResultantStones()).isEqualTo(1);
         assertThat(p.getHouse()).isEqualTo(1);
         p.printCurrentStatus();
 
-        int captureIndex = p.play(indexPit);
-        assertThat(captureIndex).isLessThan(0);
-        assertThat(captureIndex).isEqualTo(-indexPitWillBeEmpty);
+        playResult = p.play(indexPit);
+        assertThat(playResult.getResultantStones()).isLessThan(0);
+        assertThat(playResult.isPerfectMovement()).isFalse();
+        assertThat(playResult.getResultantStones()).isEqualTo(-indexPitWillBeEmpty);
         assertThat(p.getPits()[indexPit]).isEqualTo(0);
-        assertThat(p.getHouse()).isEqualTo(2); // house captures.
+        assertThat(p.getHouse()).isEqualTo(1);
         p.printCurrentStatus();
 
     }

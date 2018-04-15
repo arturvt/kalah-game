@@ -51,12 +51,15 @@ public class Player {
      * Plays the selected index and returns the number of stones that should
      * be passed to next player.
      *
-     * @return playResult - int
-     * 0: means that the last stone was in user's house.
+     * @return playResult - SimpleEntry<Integer, Boolean>
+     * the value (boolean) means if user did a perfect movement (last stone in house)
+     * the key (int):
+     * 0: no stones should be passed to other player nor capture movement.
      * +1: the number of stones for following user
-     * -1: the index of a house's capture. This is when last stone was in an empty pits owned by this player.
+     * -1: the index of a house's capture.
+     * This is when last stone was in an empty pits owned by this player.
      */
-    final public int play(int indexPit) throws BadAttributeValueExpException {
+    final public PlayResult play(int indexPit) throws BadAttributeValueExpException {
         if (this.pits[indexPit] == 0) {
             logger.error("Attempt to play in an empty pit; Index: " + indexPit);
             throw new BadAttributeValueExpException("Invalid move!");
@@ -76,17 +79,13 @@ public class Player {
             this.pits[i]++;
         }
 
-        // when not 0, means that we have a capture or the resultant must be passed to home and next user
-        if (totalStonesToDistribute != 0) {
+        if (totalStonesToDistribute > 0) {
             this.house++;
-
-            // This register the house's
-            if (totalStonesToDistribute > 0) {
-                totalStonesToDistribute--;
-            }
+            totalStonesToDistribute--;
         }
 
-        return totalStonesToDistribute;
+        boolean perfectMovement = totalStonesToDistribute == 0;
+        return new PlayResult(totalStonesToDistribute, perfectMovement);
     }
 
     /**

@@ -22,7 +22,7 @@ public class GameServiceTest {
     @BeforeClass
     public static void setupClass() {
         AppConfig config = new AppConfig();
-        config.setDefaultFirstPlayer(1);
+        config.setDefaultFirstPlayer(0);
         config.setRulesEmptyHouse(true);
         config.setStonesNumber(INIT_STONES_SIZE);
         gameService = new GameService(config);
@@ -44,12 +44,58 @@ public class GameServiceTest {
     }
 
     @Test
-    public void shouldSwitchPlayerWhenSimplePlay() {
+    public void shouldSwitchPlayerWhenSimplePlay() throws BadAttributeValueExpException {
         gameService.initGame();
+        Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
+        // Sanity check
+        assertThat(p1.getHouse()).isEqualTo(0);
+        assertThat(p1.getPits()[0]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[1]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[2]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[3]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[4]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[5]).isEqualTo(INIT_STONES_SIZE);
+        // first move check
+        gameService.play(1);
+        assertThat(p1.getHouse()).isEqualTo(1);
+        assertThat(p1.getPits()[0]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p1.getPits()[1]).isEqualTo(0);
+        assertThat(p1.getPits()[2]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p1.getPits()[3]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p1.getPits()[4]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p1.getPits()[5]).isEqualTo(INIT_STONES_SIZE + 1);
+
+        Player p2 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
+        // Sanity check
+        assertThat(p2.getHouse()).isEqualTo(0);
+        assertThat(p2.getPits()[0]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p2.getPits()[1]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p2.getPits()[2]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p2.getPits()[3]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p2.getPits()[4]).isEqualTo(INIT_STONES_SIZE);
+        assertThat(p2.getPits()[5]).isEqualTo(INIT_STONES_SIZE);
+        gameService.play(1);
+        // second move check
+        assertThat(p2.getHouse()).isEqualTo(1);
+        assertThat(p2.getPits()[0]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p2.getPits()[1]).isEqualTo(0);
+        assertThat(p2.getPits()[2]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p2.getPits()[3]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p2.getPits()[4]).isEqualTo(INIT_STONES_SIZE + 1);
+        assertThat(p2.getPits()[5]).isEqualTo(INIT_STONES_SIZE + 1);
+
+    }
+
+    @Test
+    public void shouldCaptureWhenReachLastMovement() {
+        gameService.initGame();
+        Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
+        Player p2 = gameService.getPlayers()[gameService.getNextPlayerIndex()];
         // Should not start from the first as by now the number of houses is the same as stones
-        IntStream.range(1, Player.NUMBER_HOUSES-1).forEach(index -> {
+        IntStream.range(1, Player.NUMBER_HOUSES).forEach(index -> {
             try {
                 gameService.play(index);
+                gameService.printPlayersStatus();
                 gameService.play(index);
                 //TODO: Falta implementar a captura!
                 gameService.printPlayersStatus();
@@ -59,7 +105,25 @@ public class GameServiceTest {
 
         });
 
+        // With this scenario, last movement makes a great capture. Checking if it happens.
+        assertThat(p1.getHouse()).isEqualTo(5);
+        assertThat(p1.getPits()[0]).isEqualTo(0);
+        assertThat(p1.getPits()[1]).isEqualTo(6);
+        assertThat(p1.getPits()[2]).isEqualTo(5);
+        assertThat(p1.getPits()[3]).isEqualTo(4);
+        assertThat(p1.getPits()[4]).isEqualTo(3);
+        assertThat(p1.getPits()[5]).isEqualTo(1);
+
+        assertThat(p2.getHouse()).isEqualTo(19);
+        assertThat(p2.getPits()[0]).isEqualTo(13);
+        assertThat(p2.getPits()[1]).isEqualTo(6);
+        assertThat(p2.getPits()[2]).isEqualTo(5);
+        assertThat(p2.getPits()[3]).isEqualTo(3);
+        assertThat(p2.getPits()[4]).isEqualTo(2);
+        assertThat(p2.getPits()[5]).isEqualTo(0);
+
     }
+
 
     @Test
     public void gameShouldNotEndWhenJustBegin() {
@@ -76,5 +140,39 @@ public class GameServiceTest {
         GameService service = new GameService(config);
         service.initGame();
         assertThat(service.hasGameEnded()).isTrue();
+    }
+
+
+    /**
+     * In this scenario we'll play 4 stones. The third move should result in a capture.
+     */
+    @Test
+    public void playerOneShouldCaptureFromPlayerTwo() throws BadAttributeValueExpException {
+        gameService.initGame();
+
+        AppConfig config = new AppConfig();
+        config.setDefaultFirstPlayer(0);
+        config.setRulesEmptyHouse(true);
+        config.setStonesNumber(4);
+        GameService service = new GameService(config);
+        service.initGame();
+        service.play(Player.NUMBER_HOUSES - 2); // the one before last house
+        service.play(0); // last house
+        service.printPlayersStatus();
+        service.play(0);
+
+        assertThat(service.getPlayers()[0].getHouse()).isEqualTo(8);
+        assertThat(service.getPlayers()[0].getPits()[Player.NUMBER_HOUSES-2]).isEqualTo(8);
+
+        assertThat(service.getPlayers()[1].getHouse()).isEqualTo(0);
+        assertThat(service.getPlayers()[1].getPits()[Player.NUMBER_HOUSES-2]).isEqualTo(0);
+
+
+
+    }
+
+    @Test
+    public void gameShouldEndWhenAPlayerHasNotStonesInPitsAfterSomeMoves() {
+        fail("Not yet implemented");
     }
 }

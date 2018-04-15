@@ -2,6 +2,7 @@ package com.kalah.core.services;
 
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.model.PlayResult;
 import com.kalah.core.model.Player;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,14 +72,14 @@ public class GameService {
             logger.info("End Game!");
             logger.info("Checking the winner...");
         } else {
-            int playResult = this.players[this.currentPlayerRound].play(indexPit);
+            PlayResult playResult = this.players[this.currentPlayerRound].play(indexPit);
 
-            if (playResult == 0) {
+            if (playResult.isPerfectMovement()) {
                 logger.info(String.format("[%d] - has a new turn!", this.currentPlayerRound));
-            } else if (playResult > 0) {
-                distributeStones(playResult);
+            } else if (playResult.getResultantStones() > 0) {
+                distributeStones(playResult.getResultantStones());
             } else {
-                captureStones(-playResult);
+                captureStones(-playResult.getResultantStones());
             }
         }
     }
@@ -89,7 +90,7 @@ public class GameService {
     }
 
 
-    private int getNextPlayerIndex() {
+    public int getNextPlayerIndex() {
         return this.currentPlayerRound == 0 ? 1 : 0;
     }
 
@@ -101,6 +102,7 @@ public class GameService {
     /**
      * Distribute stones among players.
      * Current player should aways add into it's house if remaining reaches there.
+     *
      * @param playResult
      */
     private void distributeStones(int playResult) {
