@@ -1,4 +1,4 @@
-package com.kalah.core;
+package com.kalah.core.util;
 
 public enum GameStatus {
     NOT_STARTED("Not Started"),

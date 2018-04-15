@@ -1,6 +1,6 @@
 package com.kalah.core.model;
 
-import com.kalah.core.GameStatus;
+import com.kalah.core.util.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.exceptions.BadMovementException;
 import org.apache.commons.logging.Log;
@@ -136,7 +136,7 @@ public class Game {
         }
     }
 
-    private Player getCurrentPlayer() {
+    public Player getCurrentPlayer() {
         return this.players[currentPlayerRound];
     }
 

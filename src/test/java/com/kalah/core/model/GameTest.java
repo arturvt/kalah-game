@@ -1,6 +1,6 @@
 package com.kalah.core.model;
 
-import com.kalah.core.GameStatus;
+import com.kalah.core.util.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.exceptions.BadMovementException;
 import org.junit.BeforeClass;
