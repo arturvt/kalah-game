@@ -76,10 +76,14 @@ public class Player {
             this.pits[i]++;
         }
 
-        // We must credit the house if it's missing stones.
-        if (totalStonesToDistribute > 0) {
+        // when not 0, means that we have a capture or the resultant must be passed to home and next user
+        if (totalStonesToDistribute != 0) {
             this.house++;
-            totalStonesToDistribute--;
+
+            // This register the house's
+            if (totalStonesToDistribute > 0) {
+                totalStonesToDistribute--;
+            }
         }
 
         return totalStonesToDistribute;

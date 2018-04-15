@@ -5,7 +5,7 @@ import org.junit.Test;
 import javax.management.BadAttributeValueExpException;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 public class PlayerTest {
     private static final String P_NAME = "Player";
@@ -103,6 +103,46 @@ public class PlayerTest {
         assertThat(p.getHouse()).isEqualTo(1);
         int expectedResultant = numberOfStones - (Player.NUMBER_HOUSES + 1); // we add the house here
         assertThat(result).isEqualTo(expectedResultant);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenInvalidMove() {
+        Player p = new Player(P_NAME, 1);
+        try {
+            p.play(2);
+        } catch (BadAttributeValueExpException e) {
+            // ignore
+            fail("Should not throw right now!");
+        }
+
+        // Running twice at the same pit will throw an exception as this pit should be empty.
+        Throwable thrown = catchThrowable(() -> p.play(2));
+
+        assertThat(thrown).isInstanceOf(BadAttributeValueExpException.class)
+                .hasNoCause();
+
+    }
+
+    @Test
+    public void shouldCaptureWhenDistributionEndsInAnEmptyPit() throws BadAttributeValueExpException {
+        Player p = new Player(P_NAME, 2);
+
+        int indexPitWillBeEmpty = Player.NUMBER_HOUSES-1;
+        int indexPit = Player.NUMBER_HOUSES - 3;
+
+
+        // last house, one for Home, one for next player.
+        assertThat(p.play(indexPitWillBeEmpty)).isEqualTo(1);
+        assertThat(p.getHouse()).isEqualTo(1);
+        p.printCurrentStatus();
+
+        int captureIndex = p.play(indexPit);
+        assertThat(captureIndex).isLessThan(0);
+        assertThat(captureIndex).isEqualTo(-indexPitWillBeEmpty);
+        assertThat(p.getPits()[indexPit]).isEqualTo(0);
+        assertThat(p.getHouse()).isEqualTo(2); // house captures.
+        p.printCurrentStatus();
+
     }
 
 }
