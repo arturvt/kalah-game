@@ -15,12 +15,14 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class GameServiceTest {
 
+    private static final int NUMBER_STONES = 6;
+
     private static AppConfig generateDefaultAppConfig() {
         AppConfig config = new AppConfig();
         config.setDefaultFirstPlayer(0);
         config.setRulesEmptyHouse(true);
         config.setRemainingGoesToOwner(true);
-        config.setStonesNumber(5);
+        config.setStonesNumber(NUMBER_STONES);
         return config;
     }
 
@@ -32,7 +34,7 @@ public class GameServiceTest {
         assertThat(dto.getPlayers()).isNotNull();
         for (int i = 0; i < 2; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
-            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(5));
+            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(NUMBER_STONES));
         }
     }
 
@@ -49,6 +51,10 @@ public class GameServiceTest {
 
     }
 
+    /**
+     * This is a sanity check that the game will finish no matter how many moves it's required.
+     * Technically it can perform infinity loops and this approach could be improved in the future.
+     */
     @Test
     public void properlyEndsGame() {
         GameService service = new GameService(generateDefaultAppConfig());
@@ -63,6 +69,9 @@ public class GameServiceTest {
                     assertThat(dto.getPlayerTurn()).isEqualTo(-1);
                     // at least one player should be empty
                     assertThat(Arrays.stream(dto.getPlayers()).anyMatch(Player::hasAllPitsEmpty)).isTrue();
+                    int totalStones = dto.getPlayers()[0].getHouse() + dto.getPlayers()[1].getHouse();
+                    assertThat(totalStones).isEqualTo(Player.NUMBER_HOUSES * NUMBER_STONES * 2);
+                    System.out.println("End result:" + dto.getGameStatus());
                     break;
                 }
             } catch (IllegalArgumentException e) {

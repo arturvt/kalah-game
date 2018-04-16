@@ -64,11 +64,17 @@ You can change that on application.properties file.
 Run: ```java -jar core.jar``` you can find the core.jar file in $ProjectPath/build/libs after running ```gradle build```
 
 
+### Web App
+
+A small project using Angular 5 is used as a frontend. It's not fancy but usable. 
+You can find the source code at: `webapp/webapp.zip` with a README with running instruction.
+
 ## Usage
 
 ### Web
 
 Just open you browser the url: localhost:8080  and have fun. 
+There is no visual feedback (like a message) when it's a capture or "you can play again", but they're working.
 
 ### API
 
@@ -78,6 +84,9 @@ All available API endpoints (only GET methods):
  - Init a game: `localhost:8080/api/init`
  - Play: `localhost:8080/api/play/{index_id}`
     - Please note that it isn't required to determine who's going to be the player. API methods are only allowed to play some index.
+    
+You can look in the logs what's going on. They let the user know who's the winner.   
+ 
     
 
 

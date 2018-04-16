@@ -1,12 +1,11 @@
 package com.kalah.core.model;
 
-import com.kalah.core.util.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.exceptions.BadMovementException;
+import com.kalah.core.util.GameStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -242,6 +241,9 @@ public class GameTest {
     }
 
 
+    /**
+     * A sanity check that the game should end.
+     */
     @Test
     public void gameShouldEndWhenNotStonesInOnePlayerPitsRemainingGoesToWinner() {
         Random random = new Random();
@@ -252,22 +254,17 @@ public class GameTest {
                 game.play(index);
 
                 int totalStones = 0;
-                for (Player p: game.getPlayers()) {
+                for (Player p : game.getPlayers()) {
                     totalStones += p.getHouse();
-                    totalStones+=IntStream.of(p.getPits()).sum();
+                    totalStones += IntStream.of(p.getPits()).sum();
                 }
-                assertThat(totalStones).isEqualTo(Player.NUMBER_HOUSES*INIT_STONES_SIZE*2);
+                assertThat(totalStones).isEqualTo(Player.NUMBER_HOUSES * INIT_STONES_SIZE * 2);
 
 
             } catch (BadMovementException e) {
                 // ignores.
             }
         }
-
-        int indexWinner = game.getPlayers()[0].hasAllPitsEmpty() ? 0 : 1;
-        int indexLoser = -(indexWinner - 1);
-
-        game.printPlayersStatus();
-        game.finishGame();
+        assertThat(game.getGameStatus()).isNotEqualTo(GameStatus.RUNNING);
     }
 }

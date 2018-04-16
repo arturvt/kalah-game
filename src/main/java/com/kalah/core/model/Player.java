@@ -124,6 +124,8 @@ public class Player {
     final public void moveAllStonesToHouse() {
         int allStones = this.removeAllStones();
         this.addIntoHouse(allStones);
+
+        logger.info("Total stones in pits added to house: " + allStones);
     }
 
     final public int removeAllStones() {
