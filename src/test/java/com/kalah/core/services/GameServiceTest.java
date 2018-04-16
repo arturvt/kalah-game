@@ -2,8 +2,10 @@ package com.kalah.core.services;
 
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
+import com.kalah.core.exceptions.PitIndexNotExists;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.util.Arrays;
 
@@ -28,5 +30,19 @@ public class GameServiceTest {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
             Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(5));
         }
+    }
+
+    @Test
+    public void whenInvalidPitRequested() {
+        GameService service = new GameService(generateDefaultAppConfig());
+        service.initGame();
+
+        // Running twice at the same pit will throw an exception as this pit should be empty.
+        Throwable thrown = catchThrowable(() -> service.play(10));
+
+        assertThat(thrown).isInstanceOf(PitIndexNotExists.class)
+                .hasNoCause();
+
+
     }
 }

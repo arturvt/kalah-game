@@ -1,6 +1,7 @@
 package com.kalah.core.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kalah.core.model.Game;
 import com.kalah.core.model.Player;
 import com.kalah.core.util.GameStatus;
 
@@ -17,54 +18,15 @@ public class PlayersDTO {
     @JsonProperty("playerTurn")
     private final String playerTurn;
 
-    private PlayersDTO(GameStatus gameStatus, String playerTurn, Date lastUpdate, Player[] players) {
-        this.gameStatus = gameStatus.getValue();
-        this.lastUpdate = lastUpdate;
-        this.players = players;
-        this.playerTurn = playerTurn;
+    public PlayersDTO(Game game) {
+        this.playerTurn = game.getCurrentPlayer().getPlayerName();
+        this.gameStatus = game.getGameStatus().getValue();
+        this.lastUpdate = new Date();
+        this.players = game.getPlayers();
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    final public Date getLastUpdate() {
-        return lastUpdate;
-    }
-
-    final public Player[] getPlayers() {
-        return players;
-    }
-
-    public static class Builder {
-        private GameStatus gameStatus = GameStatus.NOT_STARTED;
-        private Date lastUpdate;
-        private Player[] players;
-        private String playerTurn;
-
-        public Builder setPlayerTurn(String playerTurn) {
-            this.playerTurn = playerTurn;
-            return this;
-        }
-
-        public Builder setGameStatus(GameStatus gameStatus) {
-            this.gameStatus = gameStatus;
-            return this;
-        }
-
-        public Builder setLastUpdate(Date lastUpdate) {
-            this.lastUpdate = lastUpdate;
-            return this;
-        }
-
-        public Builder setPlayers(Player[] players) {
-            this.players = players;
-            return this;
-        }
-
-        public PlayersDTO createPlayersDTO() {
-            return new PlayersDTO(gameStatus, playerTurn, lastUpdate, players);
-        }
+    public final Player[] getPlayers() {
+        return this.players;
     }
 
 }
