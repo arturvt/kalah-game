@@ -47,7 +47,7 @@ public class Game {
     }
 
     final public Integer getCurrentPlayerRound() {
-        return currentPlayerRound;
+        return this.currentPlayerRound;
     }
 
     /**
@@ -150,12 +150,15 @@ public class Game {
 
 
     public GameStatus getGameStatus() {
+        if(hasGameEnded()) {
+           finishGame();
+        }
         return gameStatus;
     }
 
     public void finishGame() {
         if (gameConfig.isRemainingGoesToOwner()) {
-            int indexStillMissingStones = this.players[0].hasAllPitsEmpty() ? 0 : 1;
+            int indexStillMissingStones = this.players[0].hasAllPitsEmpty() ? 1 : 0;
             this.players[indexStillMissingStones].moveAllStonesToHouse();
         }
 
@@ -170,6 +173,7 @@ public class Game {
         } else {
             this.gameStatus = GameStatus.PLAYER_2_WON;
         }
+        this.currentPlayerRound = -1;
 
     }
 

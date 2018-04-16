@@ -32,6 +32,16 @@ pit and it's own house. In case of remaining stones this object shall inform to 
 * A capture play. The last stone of a regular play stops in an empty pit. Player shall notify the caller that it was a
 capture movement. The caller should determine which rule is going to be applied.
 
+## Configuring the project
+
+There is an `application.properties` file in `/src/main/resources/application.properties` where you can configure:
+
+ - Initial stones number (6)
+ - Empty House rule (true)
+    - When true, a capture opponents opposite pit content when it's a capture
+ - Default first player (0)
+ - Remaining stones goes to owner at the end of game (false)
+
 
 ## Running project
 

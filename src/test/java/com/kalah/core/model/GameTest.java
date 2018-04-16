@@ -6,6 +6,7 @@ import com.kalah.core.exceptions.BadMovementException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -17,11 +18,11 @@ public class GameTest {
     private static final int INIT_STONES_SIZE = 6;
     private static final int FIRST_PLAYER_INDEX = 0;
 
-    private static Game gameService;
+    private static Game game;
 
     @BeforeClass
     public static void setupClass() {
-        gameService = new Game(generateDefaultAppConfig());
+        game = new Game(generateDefaultAppConfig());
     }
 
     private static AppConfig generateDefaultAppConfig() {
@@ -49,8 +50,8 @@ public class GameTest {
 
     @Test
     public void shouldSwitchPlayerWhenSimplePlay() throws BadMovementException {
-        gameService.initGame();
-        Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
+        game.initGame();
+        Player p1 = game.getPlayers()[game.getCurrentPlayerRound()];
         // Sanity check
         assertThat(p1.getHouse()).isEqualTo(0);
         assertThat(p1.getPits()[0]).isEqualTo(INIT_STONES_SIZE);
@@ -60,7 +61,7 @@ public class GameTest {
         assertThat(p1.getPits()[4]).isEqualTo(INIT_STONES_SIZE);
         assertThat(p1.getPits()[5]).isEqualTo(INIT_STONES_SIZE);
         // first move check
-        gameService.play(1);
+        game.play(1);
         assertThat(p1.getHouse()).isEqualTo(1);
         assertThat(p1.getPits()[0]).isEqualTo(INIT_STONES_SIZE);
         assertThat(p1.getPits()[1]).isEqualTo(0);
@@ -69,7 +70,7 @@ public class GameTest {
         assertThat(p1.getPits()[4]).isEqualTo(INIT_STONES_SIZE + 1);
         assertThat(p1.getPits()[5]).isEqualTo(INIT_STONES_SIZE + 1);
 
-        Player p2 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
+        Player p2 = game.getPlayers()[game.getCurrentPlayerRound()];
         // Sanity check
         assertThat(p2.getHouse()).isEqualTo(0);
         assertThat(p2.getPits()[0]).isEqualTo(INIT_STONES_SIZE + 1);
@@ -78,7 +79,7 @@ public class GameTest {
         assertThat(p2.getPits()[3]).isEqualTo(INIT_STONES_SIZE);
         assertThat(p2.getPits()[4]).isEqualTo(INIT_STONES_SIZE);
         assertThat(p2.getPits()[5]).isEqualTo(INIT_STONES_SIZE);
-        gameService.play(1);
+        game.play(1);
         // second move check
         assertThat(p2.getHouse()).isEqualTo(1);
         assertThat(p2.getPits()[0]).isEqualTo(INIT_STONES_SIZE + 1);
@@ -98,21 +99,21 @@ public class GameTest {
      */
     @Test
     public void shouldCaptureWhenReachLastMovement() throws BadMovementException {
-        gameService.initGame();
-        Player p1 = gameService.getPlayers()[gameService.getCurrentPlayerRound()];
-        Player p2 = gameService.getPlayers()[gameService.getNextPlayerIndex()];
+        game.initGame();
+        Player p1 = game.getPlayers()[game.getCurrentPlayerRound()];
+        Player p2 = game.getPlayers()[game.getNextPlayerIndex()];
 
         // Preparing the environment
         IntStream.range(1, Player.NUMBER_HOUSES).forEach(index -> {
             try {
-                gameService.play(index); // p1
-                gameService.printPlayersStatus();
+                game.play(index); // p1
+                game.printPlayersStatus();
                 if (index == Player.NUMBER_HOUSES - 1) {
                     System.out.println("-----------");
                     return;
                 }
-                gameService.play(index); // p2
-                gameService.printPlayersStatus();
+                game.play(index); // p2
+                game.printPlayersStatus();
             } catch (BadMovementException e) {
                 fail("This house shouldn't be empty!");
             }
@@ -135,7 +136,7 @@ public class GameTest {
         assertThat(p2.getPits()[4]).isEqualTo(1);
         assertThat(p2.getPits()[5]).isEqualTo(13);
 
-        gameService.play(Player.NUMBER_HOUSES - 1); // now the movement.
+        game.play(Player.NUMBER_HOUSES - 1); // now the movement.
 
         // With this scenario, last movement makes a great capture. Checking if it happens.
         assertThat(p1.getHouse()).isEqualTo(5);
@@ -159,8 +160,8 @@ public class GameTest {
 
     @Test
     public void gameShouldNotEndWhenJustBegin() {
-        gameService.initGame();
-        assertThat(gameService.hasGameEnded()).isFalse();
+        game.initGame();
+        assertThat(game.hasGameEnded()).isFalse();
     }
 
     @Test
@@ -244,21 +245,29 @@ public class GameTest {
     @Test
     public void gameShouldEndWhenNotStonesInOnePlayerPitsRemainingGoesToWinner() {
         Random random = new Random();
-        gameService.initGame();
-        while (!gameService.hasGameEnded()) {
+        game.initGame();
+        while (!game.hasGameEnded()) {
             int index = random.nextInt(Player.NUMBER_HOUSES);
             try {
-                gameService.play(index);
+                game.play(index);
+
+                int totalStones = 0;
+                for (Player p: game.getPlayers()) {
+                    totalStones += p.getHouse();
+                    totalStones+=IntStream.of(p.getPits()).sum();
+                }
+                assertThat(totalStones).isEqualTo(Player.NUMBER_HOUSES*INIT_STONES_SIZE*2);
+
+
             } catch (BadMovementException e) {
                 // ignores.
             }
         }
 
-        int indexWinner = gameService.getPlayers()[0].hasAllPitsEmpty() ? 0 : 1;
+        int indexWinner = game.getPlayers()[0].hasAllPitsEmpty() ? 0 : 1;
         int indexLoser = -(indexWinner - 1);
 
-        gameService.printPlayersStatus();
-        gameService.finishGame();
-        gameService.printPlayersStatus();
+        game.printPlayersStatus();
+        game.finishGame();
     }
 }

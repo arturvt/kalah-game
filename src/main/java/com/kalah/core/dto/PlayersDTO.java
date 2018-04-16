@@ -19,14 +19,25 @@ public class PlayersDTO {
     private final int playerTurn;
 
     public PlayersDTO(Game game) {
-        this.playerTurn = game.getCurrentPlayer().getId();
         this.gameStatus = game.getGameStatus().getValue();
+        this.playerTurn = game.getCurrentPlayerRound();
         this.lastUpdate = new Date().getTime();
         this.players = game.getPlayers();
     }
 
-    public final Player[] getPlayers() {
+    final public Player[] getPlayers() {
         return this.players;
     }
 
+    final public int getPlayerTurn() {
+        return playerTurn;
+    }
+
+    final public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    final public String getGameStatus() {
+        return gameStatus;
+    }
 }

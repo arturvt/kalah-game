@@ -30,11 +30,11 @@ public class GameService {
     }
 
     public PlayersDTO play(int index) {
-        validateMovement(index);
-        game.play(index);
-
         if (game.getGameStatus() != GameStatus.RUNNING) {
             game.finishGame();
+        } else {
+            validateMovement(index);
+            game.play(index);
         }
         return new PlayersDTO(game);
     }
