@@ -11,6 +11,8 @@ public class Player {
     public static final int NUMBER_HOUSES = 6;
     final private static Log logger = LogFactory.getLog(Player.class);
 
+    @JsonProperty("id")
+    private final int id;
     @JsonProperty("playerName")
     private final String playerName;
     @JsonProperty("pits")
@@ -18,7 +20,8 @@ public class Player {
     @JsonProperty("house")
     private int house;
 
-    public Player(String playerName, int initStonesSize) {
+    public Player(int id, String playerName, int initStonesSize) {
+        this.id = id;
         this.playerName = playerName;
         this.house = 0;
         this.pits = new int[NUMBER_HOUSES];
@@ -28,6 +31,9 @@ public class Player {
         }
     }
 
+    final public int getId() {
+        return id;
+    }
 
     final public int getHouse() {
         return house;

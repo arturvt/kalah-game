@@ -11,9 +11,13 @@ public class PlayerTest {
     private static final String P_NAME = "Player";
     private static final int STONE_SIZE = 6;
 
+    private Player getDefaultPlayer() {
+        return new Player(0,P_NAME, STONE_SIZE);
+    }
+
     @Test
     public void properlyInitAPlayer() {
-        Player player = new Player(P_NAME, STONE_SIZE);
+        Player player = getDefaultPlayer();
         assertThat(player.getHouse()).isEqualTo(0);
         assertThat(player.hasAllPitsEmpty()).isFalse();
         assertThat(player.getPlayerName()).isEqualTo(P_NAME);
@@ -23,7 +27,7 @@ public class PlayerTest {
     @Test
     public void shouldBeAPerfectMovement() throws BadMovementException {
         // A player starting with 6 stones
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         // Play last house
         PlayResult res = p.play(0);
         p.printCurrentStatus();
@@ -39,7 +43,7 @@ public class PlayerTest {
 
     @Test
     public void shouldRemoveStonesFromGivenIndex() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         int res = p.removeStonesFromIndex(3);
         assertThat(res).isEqualTo(STONE_SIZE);
         assertThat(p.getPits()[3]).isEqualTo(0);
@@ -47,7 +51,7 @@ public class PlayerTest {
 
     @Test
     public void shouldAddStonesToHouse() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         assertThat(p.getHouse()).isEqualTo(0);
         p.addIntoHouse(3);
         assertThat(p.getHouse()).isEqualTo(3);
@@ -60,7 +64,7 @@ public class PlayerTest {
 
     @Test
     public void shouldDistributeStonesAndIncrementHouseNoResultant() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         int numberOfStones = 4;
 
         int result = p.distributeStones(numberOfStones, false);
@@ -84,7 +88,7 @@ public class PlayerTest {
 
     @Test
     public void shouldDistributeStonesInPitsAndDoNotUpdateHouse() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         int numberOfStones = 10;
         int result = p.distributeStones(numberOfStones, false);
 
@@ -108,7 +112,7 @@ public class PlayerTest {
      */
     @Test
     public void shouldDistributeStonesAndDoNotUpdateHouseWithResultantEvenWithHighNumberStones() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         int numberOfStones = 100; // Higher number!
         int result = p.distributeStones(numberOfStones, false);
 
@@ -132,7 +136,7 @@ public class PlayerTest {
      */
     @Test
     public void shouldUpdateHouseAsLongAsStonesRequires() {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         int times = 5;
         int numberOfStones = STONE_SIZE * times; // Higher number!
 
@@ -166,7 +170,7 @@ public class PlayerTest {
 
     @Test
     public void shouldThrowExceptionWhenInvalidMove() {
-        Player p = new Player(P_NAME, 1);
+        Player p = new Player(0, P_NAME, 1);
         try {
             p.play(2);
         } catch (BadMovementException e) {
@@ -191,7 +195,7 @@ public class PlayerTest {
      */
     @Test
     public void shouldDistributeAndReturnIsCapture() throws BadMovementException {
-        Player p = new Player(P_NAME, 2);
+        Player p = new Player(0, P_NAME, 2);
 
         int indexPitWillBeEmpty = Player.NUMBER_HOUSES - 1;
         int indexPit = Player.NUMBER_HOUSES - 3;
@@ -222,7 +226,7 @@ public class PlayerTest {
      */
     @Test
     public void shouldDistributeAndReturnAndCapture() throws BadMovementException {
-        Player p = new Player(P_NAME, 0);
+        Player p = new Player(0, P_NAME, 0);
         p.getPits()[0] = 1;
         p.getPits()[1] = 5;
         p.getPits()[2] = 4;
@@ -246,7 +250,7 @@ public class PlayerTest {
 
     @Test
     public void shouldRemoveAllMissingStones() throws BadMovementException {
-        Player p = new Player(P_NAME, STONE_SIZE);
+        Player p = getDefaultPlayer();
         p.play(Player.NUMBER_HOUSES - 1);
         p.play(Player.NUMBER_HOUSES - 2);
         int numberOfStones = p.removeAllStones();

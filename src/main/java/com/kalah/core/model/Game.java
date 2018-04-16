@@ -1,8 +1,8 @@
 package com.kalah.core.model;
 
-import com.kalah.core.util.GameStatus;
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.exceptions.BadMovementException;
+import com.kalah.core.util.GameStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,8 +40,8 @@ public class Game {
         logger.info("Starting a new game.");
         this.currentPlayerRound = gameConfig.getDefaultFirstPlayer();
         this.players = new Player[NUMBER_OF_PLAYERS];
-        this.players[0] = new Player("Player 01", gameConfig.getNumberStones());
-        this.players[1] = new Player("Player 02", gameConfig.getNumberStones());
+        this.players[0] = new Player(0, "Player 01", gameConfig.getNumberStones());
+        this.players[1] = new Player(1, "Player 02", gameConfig.getNumberStones());
         this.gameStatus = GameStatus.RUNNING;
         logger.info("First round: " + this.players[this.currentPlayerRound].getPlayerName());
     }
