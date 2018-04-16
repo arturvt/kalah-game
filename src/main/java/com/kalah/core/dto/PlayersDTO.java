@@ -1,50 +1,32 @@
 package com.kalah.core.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kalah.core.model.Game;
 import com.kalah.core.model.Player;
+import com.kalah.core.util.GameStatus;
 
 import java.util.Date;
 
 public class PlayersDTO {
+
+    @JsonProperty("gameStatus")
+    private final String gameStatus;
     @JsonProperty("players")
     private final Player[] players;
     @JsonProperty("lastUpdate")
     private final Date lastUpdate;
+    @JsonProperty("playerTurn")
+    private final String playerTurn;
 
-    private PlayersDTO(Date lastUpdate, Player[] players) {
-        this.lastUpdate = lastUpdate;
-        this.players = players;
+    public PlayersDTO(Game game) {
+        this.playerTurn = game.getCurrentPlayer().getPlayerName();
+        this.gameStatus = game.getGameStatus().getValue();
+        this.lastUpdate = new Date();
+        this.players = game.getPlayers();
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    final public Date getLastUpdate() {
-        return lastUpdate;
-    }
-
-    final public Player[] getPlayers() {
-        return players;
-    }
-
-    public static class Builder {
-        private Date lastUpdate;
-        private Player[] players;
-
-        public Builder setLastUpdate(Date lastUpdate) {
-            this.lastUpdate = lastUpdate;
-            return this;
-        }
-
-        public Builder setPlayers(Player[] players) {
-            this.players = players;
-            return this;
-        }
-
-        public PlayersDTO createPlayersDTO() {
-            return new PlayersDTO(lastUpdate, players);
-        }
+    public final Player[] getPlayers() {
+        return this.players;
     }
 
 }

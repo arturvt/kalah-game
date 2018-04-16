@@ -1,10 +1,10 @@
 package com.kalah.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kalah.core.exceptions.BadMovementException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.Arrays;
 
 public class Player {
@@ -26,8 +26,6 @@ public class Player {
         for (int i = 0; i < NUMBER_HOUSES; i++) {
             this.pits[i] = initStonesSize;
         }
-
-        printCurrentStatus();
     }
 
 
@@ -51,60 +49,99 @@ public class Player {
      * Plays the selected index and returns the number of stones that should
      * be passed to next player.
      *
-     * @return playResult - int
-     * 0: means that the last stone was in user's house.
-     * +1: the number of stones for following user
-     * -1: the index of a house's capture. This is when last stone was in an empty pits owned by this player.
+     * @return playResult  {@link PlayResult}
+     * - isPerfectMove?
+     * - isCaptureMove?
+     * - remainingStones
+     * - captureMoveIndexPit
      */
-    final public int play(int indexPit) throws BadAttributeValueExpException {
+    final public PlayResult play(int indexPit) throws BadMovementException {
+        PlayResult.Builder builder = PlayResult.builder();
+
+
         if (this.pits[indexPit] == 0) {
             logger.error("Attempt to play in an empty pit; Index: " + indexPit);
-            throw new BadAttributeValueExpException("Invalid move!");
+            throw new BadMovementException(indexPit);
         }
 
         int totalStonesToDistribute = this.pits[indexPit];
         this.pits[indexPit] = 0;
 
+        // This will always make a capture movement as it rotates the entire opponent and ends in the just empty
+        // pit
+        if (totalStonesToDistribute == Player.NUMBER_HOUSES * 2 + 1) {
+            builder.setCaptureIndex(indexPit);
+            builder.setCaptureMovement(true);
+        }
+
         for (int i = indexPit + 1; i < NUMBER_HOUSES && totalStonesToDistribute > 0; i++) {
             // we check if the pit is empty and is the last stone
             // indicating that this is a capture!
             if (this.pits[i] == 0 && totalStonesToDistribute == 1) {
-                totalStonesToDistribute = -i;
-            } else {
-                totalStonesToDistribute--;
+                builder.setCaptureIndex(i);
+                builder.setCaptureMovement(true);
             }
+            totalStonesToDistribute--;
             this.pits[i]++;
         }
 
-        // when not 0, means that we have a capture or the resultant must be passed to home and next user
-        if (totalStonesToDistribute != 0) {
+        if (totalStonesToDistribute > 0) {
             this.house++;
-
-            // This register the house's
-            if (totalStonesToDistribute > 0) {
-                totalStonesToDistribute--;
-            }
+            totalStonesToDistribute--;
+            builder.setPerfectMovement(totalStonesToDistribute == 0);
         }
+        builder.setResultantStones(totalStonesToDistribute);
 
-        return totalStonesToDistribute;
+        return builder.createPlayResult();
     }
 
     /**
      * Distributes stones around player pits.
      * Returns the resultant number.
+     * If shouldAddToHouse means that house can receive stones.
+     *
      * @param numberOfStones
      * @return resultant number of stones - int
      */
-    final public int distributeStones(int numberOfStones) {
-        for(int i = 0; i < NUMBER_HOUSES && numberOfStones > 0; i++) {
+    final public int distributeStones(int numberOfStones, boolean shouldAddToHouse) {
+        for (int i = 0; i < NUMBER_HOUSES && numberOfStones > 0; i++) {
             this.pits[i]++;
             numberOfStones--;
         }
-        if (numberOfStones > 0) {
+        if (shouldAddToHouse && numberOfStones > 0) {
             this.house++;
             numberOfStones--;
         }
         return numberOfStones;
+    }
+
+    final public void moveAllStonesToHouse() {
+        int allStones = this.removeAllStones();
+        this.addIntoHouse(allStones);
+    }
+
+    final public int removeAllStones() {
+        int res = 0;
+        for (int i = 0; i < Player.NUMBER_HOUSES; i++) {
+            res+= removeStonesFromIndex(i);
+        }
+        return res;
+    }
+
+    final public int removeStonesFromIndex(int index) {
+        int res = this.pits[index];
+        this.pits[index] = 0;
+        return res;
+    }
+
+    /**
+     * This method is called when a capture happens. The caller is allowed to add stones into house
+     * even when they're not in player's pits.
+     *
+     * @param stones
+     */
+    final public void addIntoHouse(int stones) {
+        this.house += stones;
     }
 
     public void printCurrentStatus() {

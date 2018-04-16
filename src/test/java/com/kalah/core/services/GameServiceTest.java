@@ -2,64 +2,47 @@ package com.kalah.core.services;
 
 import com.kalah.core.config.AppConfig;
 import com.kalah.core.dto.PlayersDTO;
-import org.junit.BeforeClass;
+import com.kalah.core.exceptions.PitIndexNotExists;
 import org.junit.Test;
-
-import javax.management.BadAttributeValueExpException;
-import java.util.Arrays;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+
+import java.util.Arrays;
 
 public class GameServiceTest {
 
-    private static final int INIT_STONES_SIZE = 6;
-
-    private static GameService gameService;
-
-    @BeforeClass
-    public static void setupClass() {
+    private static AppConfig generateDefaultAppConfig() {
         AppConfig config = new AppConfig();
-        config.setDefaultFirstPlayer(1);
+        config.setDefaultFirstPlayer(0);
         config.setRulesEmptyHouse(true);
-        config.setStonesNumber(INIT_STONES_SIZE);
-        gameService = new GameService(config);
+        config.setRemainingGoesToOwner(true);
+        config.setStonesNumber(5);
+        return config;
     }
 
 
-    /**
-     * Validates if when game starts, it follows config settings
-     */
     @Test
     public void initGame() {
-        PlayersDTO dto = gameService.initGame();
-        assertThat(gameService.getCurrentPlayerRound()).isEqualTo(1);
+        GameService service = new GameService(generateDefaultAppConfig());
+        PlayersDTO dto = service.initGame();
         assertThat(dto.getPlayers()).isNotNull();
-        for (int i = 0; i < GameService.NUMBER_OF_PLAYERS; i++) {
+        for (int i = 0; i < 2; i++) {
             assertThat(dto.getPlayers()[i].getHouse()).isEqualTo(0);
-            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(INIT_STONES_SIZE));
+            Arrays.stream(dto.getPlayers()[i].getPits()).forEach(pit -> assertThat(pit).isEqualTo(5));
         }
     }
 
     @Test
-    public void play() throws BadAttributeValueExpException {
-        gameService.initGame();
-        gameService.play(1);
-    }
-
-    @Test
-    public void gameShouldNotEndWhenJustBegin() {
-        gameService.initGame();
-        assertThat(gameService.hasGameEnded()).isFalse();
-    }
-
-    @Test
-    public void gameShouldEndWhenAPlayerHasNotPits() {
-        AppConfig config = new AppConfig();
-        config.setDefaultFirstPlayer(1);
-        config.setRulesEmptyHouse(true);
-        config.setStonesNumber(0); // No stones!
-        GameService service = new GameService(config);
+    public void whenInvalidPitRequested() {
+        GameService service = new GameService(generateDefaultAppConfig());
         service.initGame();
-        assertThat(service.hasGameEnded()).isTrue();
+
+        // Running twice at the same pit will throw an exception as this pit should be empty.
+        Throwable thrown = catchThrowable(() -> service.play(10));
+
+        assertThat(thrown).isInstanceOf(PitIndexNotExists.class)
+                .hasNoCause();
+
+
     }
 }

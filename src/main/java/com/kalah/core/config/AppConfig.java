@@ -10,6 +10,7 @@ public class AppConfig {
     private int stonesNumber;
     private int defaultFirstPlayer;
     private boolean rulesEmptyHouse;
+    private boolean remainingGoesToOwner;
 
     public void setStonesNumber(int stonesNumber) {
         this.stonesNumber = stonesNumber;
@@ -21,6 +22,14 @@ public class AppConfig {
 
     public int getNumberStones() {
         return stonesNumber;
+    }
+
+    public void setRemainingGoesToOwner(boolean remainingGoesToOwner) {
+        this.remainingGoesToOwner = remainingGoesToOwner;
+    }
+
+    public boolean isRemainingGoesToOwner() {
+        return remainingGoesToOwner;
     }
 
     public boolean isRuleEmptyHouse() {
