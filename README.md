@@ -35,15 +35,43 @@ capture movement. The caller should determine which rule is going to be applied.
 
 ## Running project
 
+### Docker
+
+You can run the already build and published image in docker hub by running: ```docker-compose up``` from /docker path.
+You also can build a new local image with gradle ou makefile.
+    - Gradle: builds a new image ```gradle buildDockerImage``` 
+    - Makefile: ```make build-image```and then ```make run``` or ```docker-compose up``` from /docker path
+
+
 ### Gradle
 
 This project requires Gradle 4.x or higher. Use ```gradle bootRun``` to run. By default it'll be listening in port 8080.
 You can change that on application.properties file.
 
-### Docker
-
-To build a new docker image run: ```gradle buildDockerImage``` and then ```make run``` or ```docker-compose up``` from /docker path
 
 ### Jar
 
 Run: ```java -jar core.jar``` you can find the core.jar file in $ProjectPath/build/libs after running ```gradle build```
+
+
+## Usage
+
+### Web
+
+Just open you browser the url: localhost:8080  and have fun. 
+
+### API
+
+All available API endpoints (only GET methods):
+
+ - Home: `localhost:8080/` - this is the only method that does not returns a JSON.
+ - Init a game: `localhost:8080/api/init`
+ - Play: `localhost:8080/api/play/{index_id}`
+    - Please note that it isn't required to determine who's going to be the player. API methods are only allowed to play some index.
+    
+
+
+## For the future
+
+- Website should return a message with info about a play, for example it the result is a Capture ou a play again.
+- Improve controller unit tests.
