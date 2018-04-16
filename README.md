@@ -31,3 +31,19 @@ pit and it's own house. In case of remaining stones this object shall inform to 
 * A redistributed play. The n stones in z pits and the kalah. The remaining stones goes to the other player.
 * A capture play. The last stone of a regular play stops in an empty pit. Player shall notify the caller that it was a
 capture movement. The caller should determine which rule is going to be applied.
+
+
+## Running project
+
+### Gradle
+
+This project requires Gradle 4.x or higher. Use ```gradle bootRun``` to run. By default it'll be listening in port 8080.
+You can change that on application.properties file.
+
+### Docker
+
+To build a new docker image run: ```gradle buildDockerImage``` and then ```make run``` or ```docker-compose up``` from /docker path
+
+### Jar
+
+Run: ```java -jar core.jar``` you can find the core.jar file in $ProjectPath/build/libs after running ```gradle build```

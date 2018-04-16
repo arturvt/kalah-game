@@ -14,14 +14,14 @@ public class PlayersDTO {
     @JsonProperty("players")
     private final Player[] players;
     @JsonProperty("lastUpdate")
-    private final Date lastUpdate;
+    private final long lastUpdate;
     @JsonProperty("playerTurn")
-    private final String playerTurn;
+    private final int playerTurn;
 
     public PlayersDTO(Game game) {
-        this.playerTurn = game.getCurrentPlayer().getPlayerName();
+        this.playerTurn = game.getCurrentPlayer().getId();
         this.gameStatus = game.getGameStatus().getValue();
-        this.lastUpdate = new Date();
+        this.lastUpdate = new Date().getTime();
         this.players = game.getPlayers();
     }
 
